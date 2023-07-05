@@ -22,6 +22,7 @@ namespace CardsCustomers
                 option.UseSqlServer(builder.Configuration.GetConnectionString("CardsCustomerDb")));
 
             builder.Services.AddScoped<ICustomerService, CustomerService>();
+            builder.Services.AddScoped<ITransactionService, TransactionService>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

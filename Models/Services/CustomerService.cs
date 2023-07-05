@@ -44,7 +44,6 @@ namespace CardsCustomers.Models.Services
             try
             {
                 var local = _context.Set<Customer>().Local.FirstOrDefault(entry => entry.IdCustomer.Equals(customer.IdCustomer));
-                // check if local is not null
                 if (local != null)
                 {
                     // detach
@@ -52,6 +51,7 @@ namespace CardsCustomers.Models.Services
                 }
                 _context.Entry(customer).State = EntityState.Modified;
                 _context.SaveChanges();
+                _navigationManager.NavigateTo("customers");
             }
             catch
             {

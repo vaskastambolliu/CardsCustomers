@@ -1,0 +1,84 @@
+﻿@page "/transactions"
+@using CardsCustomers.Models.Services;
+@using CardsCustomers.Models;
+@inject ITransactionService TransactionService
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Transactions</PageTitle>
+
+<h1>Transactions</h1>
+
+<p>This is the list of registrated Transactions.</p>
+<br/>
+<button class="btn btn-sm  btn-primary" @onclick="@(() => CreateNewTransaction())">Create Transaction</button>
+<br />
+@if (AllTransactions == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Edit</th>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>Date</th>
+                <th>Card</th>
+                <th>Purchase</th>
+                <th>Discount</th>
+                <th>Points</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var transaction in AllTransactions)
+            {
+                <tr>
+                    <td><a class="btn btn-sm btn-warning" href="/ttransaction/@transaction.IdTransaction">Edit</a></td>
+                    <td>@Convert.ToString(@transaction.Name)</td>
+                    <td>@Convert.ToString(@transaction.Surname)</td>
+                    <td>@transaction.InsertDate.ToShortDateString()</td>
+                    <td>@Convert.ToString(@transaction.TimeStampIdCard)</td>
+                    <td>@Convert.ToInt32(@transaction.Purchase)</td>
+                    <td>@Convert.ToInt32(@transaction.Discount)</td>
+                    <td>@Convert.ToInt32(@transaction.Points)</td>
+                    <td class="text-right">
+                     @*   <a class="btn btn-primary btn-sm" href="/players/detail/@item.Id" role="button">Details</a>
+                        <a class="btn btn-secondary btn-sm" href="/players/edit/@item.Id" role="button">Edit</a>*@
+                        @*<button class="btn btn-danger btn-sm" @onclick="@(e => DeleteCustomer(item.Id))" role="button">Delete</button>*@
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-danger"
+                        @onclick="@(() => DeleteTransaction(transaction))">
+                            Delete
+                        </button>
+                    </td>
+                   
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Inject]
+    DbCoreloginContext Context { get; set; }
+    public IEnumerable<dynamic> AllTransactions { get; set; }
+    protected override void OnInitialized()
+    {
+        AllTransactions = TransactionService.GetAllTransactions().ToList();
+    }
+
+    public void DeleteTransaction(Transaction c)
+    {
+        Context.Remove(c);
+        Context.SaveChanges();
+    }
+
+    void CreateNewTransaction()
+    {
+        NavigationManager.NavigateTo("/ttransaction");
+    }
+}
