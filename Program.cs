@@ -23,6 +23,8 @@ namespace CardsCustomers
 
             builder.Services.AddScoped<ICustomerService, CustomerService>();
             builder.Services.AddScoped<ITransactionService, TransactionService>();
+            builder.Services.AddScoped<IPointsPerMoneyService, PointsPeMoneyService>();
+            builder.Services.AddScoped<IDiscountService, DiscountService>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

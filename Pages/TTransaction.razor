@@ -6,6 +6,7 @@
 @inject ITransactionService TransactionService
 @inject ICustomerService CustomerService
 @inject IPointsPerMoneyService PointsPerMoneyService
+@inject IDiscountService DiscountService
 @inject NavigationManager NavigationManager
 
 @*<h3>Customer</h3>*@
@@ -67,7 +68,8 @@ else
         </label>
         <div class="col-sm-4">
             <InputNumber id="purchase" class="form-control"
-                         @bind-Value="Transaction.Purchase" @oninput="CalculateDiscount" />
+                         @bind-Value="Transaction.Purchase" @oninput="CalculateDiscount"
+                         required="@true" />
         </div>
     </div>
 
@@ -76,8 +78,22 @@ else
             Discount
         </label>
         <div class="col-sm-4">
-            <InputNumber id="discount" class="form-control"
-                         @bind-Value="Transaction.Discount" />
+            <InputSelect id="discount" @bind-Value="@IdDiscount" @oninput="DiscountFromDdw" class="form-select">
+                <option value="-1"> -- Select -- </option>
+                @foreach (var disc in DiscountList)
+                {
+                    <option value="@disc.IdDiscount">@disc.DiscountName</option>
+                }
+
+            </InputSelect>
+        </div>
+
+        <label for="points" class="col-sm-2 col-form-label">
+            Points of This Purchase
+        </label>
+        <div class="col-sm-2">
+            <InputNumber id="points" class="form-control"
+                         @bind-Value="@PointOfCurrentTransaction" readonly="@true" />
         </div>
     </div>
 
@@ -110,6 +126,7 @@ else
     public int? Id { get; set; }
 
     string btnText = string.Empty;
+    int PointOfCurrentTransaction = 0;
     [Inject]
     DbCoreloginContext Context { get; set; }
     Transaction Transaction = new Transaction();
@@ -118,6 +135,7 @@ else
     public IEnumerable<Discount> DiscountList { get; set; } = new List<Discount>();
 
     public string IdCustomer { get; set; }
+    public string IdDiscount { get; set; }
     private string IdCustomerValueDdw { get; set; }
 
     protected override async Task OnParametersSetAsync()
@@ -185,28 +203,32 @@ else
 
     private void CalculateDiscount(ChangeEventArgs args)
     {
-        if (args.Value is not null)
+        if (!string.IsNullOrEmpty(args.Value.ToString()))
         {
             if (Convert.ToString(args.Value) != "-1")
             {
                 int Purchase = Convert.ToInt32(args.Value);
-                decimal? PointsEarnedFromLastPurchase = null;
+                decimal? PointsEarnedFromLastPurchase = 0;
+                decimal lastpointssaved = 0;
+                //int? pointfromobj = Transaction.Points;
 
                 var pointspermoney = PointsPerMoneyService.GetAllPointsPerMoney();
                 if (pointspermoney is null)
                 {
-                    
+
                 }
                 else
                 {
-                    var lastpointssaved = PointsPerMoneyService.GetLastPointPerMoneySaved();
+                    lastpointssaved = PointsPerMoneyService.GetLastPointPerMoneySaved();
                     if (lastpointssaved != null)
                     {
                         PointsEarnedFromLastPurchase = lastpointssaved * Purchase;
-                        var points = PointsEarnedFromLastPurchase + Transaction.Points;
-                        Transaction.Points = Convert.ToInt32(points);
+                        //var points = PointsEarnedFromLastPurchase + pointfromobj;
+                        PointOfCurrentTransaction = Convert.ToInt32(PointsEarnedFromLastPurchase);
+                        //Transaction.Points = Convert.ToInt32(points);
                     }
-
+                    DiscountList = DiscountService.GetAllDiscount().ToList().Where(x => x.PointsNeeded <= Purchase);
+                    IdDiscount = Transaction.Discount.ToString();
                 }
 
 
@@ -219,6 +241,16 @@ else
             }
 
         }
+    }
+
+
+    public void DiscountFromDdw(ChangeEventArgs args)
+    {
+        string discount = Convert.ToString(args.Value);
+
+
+        //DiscountList = DiscountService.GetAllDiscount(Transaction.Purchase).ToList();
+        //IdDiscount = Transaction.Discount.ToString();
     }
 
     //public void HandleValidSubmit()
