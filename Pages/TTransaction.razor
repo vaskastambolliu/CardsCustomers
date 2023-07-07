@@ -26,14 +26,14 @@ else
     <h3 class="text-center">Edit Transaction</h3>
 }
 
-<EditForm Model="Transaction">
+<EditForm Model="Transaction" OnSubmit="HandleSubmit">
 
     <hr />
 
     <div class="row mt-3">
         <label for="client" class="col-sm-2 col-form-label">Client</label>
         <div class="col-sm-4">
-            <InputSelect id="client" @bind-Value="@IdCustomer" @oninput="CustomerFromDdw" class="form-select">
+            <InputSelect id="client" @bind-Value="Transaction.IdCustomer" @oninput="CustomerFromDdw" class="form-select">
                 <option value="-1"> -- Select -- </option>
                 @foreach (var cust in CustomerList)
                 {
@@ -78,7 +78,7 @@ else
             Discount
         </label>
         <div class="col-sm-4">
-            <InputSelect id="discount" @bind-Value="@IdDiscount" @oninput="DiscountFromDdw" class="form-select">
+            <InputSelect id="discount" @bind-Value="Transaction.Discount" @oninput="DiscountFromDdw" class="form-select">
                 <option value="-1"> -- Select -- </option>
                 @foreach (var disc in DiscountList)
                 {
@@ -103,7 +103,7 @@ else
         </label>
         <div class="col-sm-4">
             <InputNumber id="newvalue" class="form-control"
-                         @bind-Value="Transaction.NewValue" readonly="@true" />
+                         @bind-Value="Transaction.NewValue" />
         </div>
     </div>
 
@@ -113,7 +113,7 @@ else
         </label>
         <div class="col-sm-4">
             <InputNumber id="balance" class="form-control"
-                         @bind-Value="Transaction.Balance" readonly="@true" />
+                         @bind-Value="Transaction.Balance"  />
         </div>
     </div>
     <div class="col-sm-2 row mt-3"> <button type="submit" class="btn btn-primary">@btnText</button></div>
