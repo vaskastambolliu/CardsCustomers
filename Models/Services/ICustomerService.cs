@@ -4,7 +4,8 @@
     {
         IEnumerable<Customer> GetAllCustomers();
         void CreateCustomer(Customer customer);
-        void UpdateCustomer(long id, Customer customer);
+        void UpdateCustomer(int id, Customer customer);
+        void UpdateCustomerWithoutRedirect(int id, Customer customer);
         Customer GetCustomerById(int? id);
         void DeleteCustomer(int id);
         string GetTimestamp(DateTime value);

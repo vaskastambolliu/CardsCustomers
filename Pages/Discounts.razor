@@ -1,19 +1,21 @@
 ﻿@page "/Discounts"
 @using CardsCustomers.Models.Services;
 @using CardsCustomers.Models;
-@inject ICustomerService CustomerService
+@inject IDiscountService DiscountService
+@inject IPointsPerMoneyService PointsPerMoneyService
+@inject ICurrencyService CurrencyService
 @inject NavigationManager NavigationManager
 
 
-<PageTitle>Customers</PageTitle>
+<PageTitle>Discount</PageTitle>
 
-<h1>Customers</h1>
+<h1>Discounts</h1>
 
 <p>This is the list of registrated Discounts.</p>
-<br/>
-<button class="btn btn-sm  btn-primary" @onclick="@(() => CreateNewCustomer())">Create Customer</button>
 <br />
-@if (AllCustomers == null)
+<button class="btn btn-sm  btn-primary" @onclick="@(() => CreateNewDiscount())">Create Discount</button>
+<br />
+@if (AllDiscounts == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -22,64 +24,126 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th>Edit</th>
-                <th>Name</th>
-                <th>Surname</th>
-                <th>BirthDate</th>
-                <th>E-Mail</th>
-                <th>Phone</th>
-                <th>Card</th>
-                <th>Points</th>
-                <th>Delete</th>
+                <th></th>
+                <th>Discount Name</th>
+                <th>Points Needed</th>
+                <th>Discount %</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (Customer customer in AllCustomers)
+            @foreach (Discount discount in AllDiscounts)
             {
                 <tr>
-                    <td><a class="btn btn-sm btn-warning" href="/CCustomer/@customer.IdCustomer">Edit</a></td>
-                    <td>@customer.Name</td>
-                    <td>@customer.Surname</td>
-                    <td>@customer.DateOfBirth.ToShortDateString()</td>
-                    <td>@customer.Email</td>
-                    <td>@customer.Phone</td>
-                    <td>@customer.TimeStampIdCard</td>
-                    <td>@customer.Points</td>
-                    <td class="text-right">
-                     @*   <a class="btn btn-primary btn-sm" href="/players/detail/@item.Id" role="button">Details</a>
-                        <a class="btn btn-secondary btn-sm" href="/players/edit/@item.Id" role="button">Edit</a>*@
-                        @*<button class="btn btn-danger btn-sm" @onclick="@(e => DeleteCustomer(item.Id))" role="button">Delete</button>*@
-                    </td>
+                    <td><a class="btn btn-sm btn-warning" href="/DDiscount/@discount.IdDiscount">Edit</a></td>
+                    <td>@discount.DiscountName</td>
+                    <td>@discount.PointsNeeded</td>
+                    <td>@discount.DiscountPercent</td>
+
                     <td>
                         <button class="btn btn-sm btn-danger"
-                        @onclick="@(() => DeleteCustomer(customer))">
+                        @onclick="@(() => DeleteDiscount(discount.IdDiscount))">
                             Delete
                         </button>
                     </td>
-                   
+
                 </tr>
             }
         </tbody>
     </table>
 }
 
+
+<EditForm Model="PointsPerMoney">
+
+
+    <div class="row mt-3">
+        <label for="PointGainSystem" class="col-sm-2 col-form-label">
+            Point Gain System
+        </label>
+        <div class="col-sm-2">
+            <InputNumber id="PointsPerMoneyValue" class="form-control"
+                         @bind-Value="PointsPerMoney.PointsPerMoneyValue" />
+        </div>
+
+        <div class="col-sm-2">
+            <span class="text-success"> pt = 1 (ALL)</span>
+        </div>
+
+        <div class="col-sm-1">
+            <button type="submit" @onclick="@(() => SavePointsperMoney(PointsPerMoney))" class="btn btn-success">Save</button>
+        </div>
+    </div>
+
+
+    <div class="row mt-3">
+        <label for="client" class="col-sm-2 col-form-label">Currency</label>
+        <div class="col-sm-2">
+            <InputSelect id="currency" @bind-Value="@IdCurrency"  class="form-select">
+
+                <option value="-1"> -- Select -- </option>
+
+                @foreach (var curr in AllCurrency)
+                {
+                    <option value="@curr.IdCurrency">@curr.CurrencyName</option>
+                }
+
+            </InputSelect>
+        </div>
+
+        <div class="col-sm-2">
+            <a class="btn btn-sm  btn-primary" href="/ccurrency">Create Currency</a>
+          @*  <button type="submit" @onclick="@(() => CreateNewCurrency())" class="btn btn-success">Create Currency</button>*@
+        </div>
+    </div>
+
+</EditForm>
+
 @code {
-    [Inject]
-    DbCoreloginContext Context { get; set; }
-    public IEnumerable<Customer> AllCustomers { get; set; }
+    public IEnumerable<Discount> AllDiscounts { get; set; }
+    public PointsPerMoney PointsPerMoney = new PointsPerMoney();
+    public IEnumerable<PointsPerMoney> AllPointsPerMoney { get; set; }
+    public int? IdCurrency { get; set; }
+    public IEnumerable<Currency> AllCurrency { get; set; }
+
     protected override void OnInitialized()
     {
-        AllCustomers = CustomerService.GetAllCustomers();
+        AllDiscounts = DiscountService.GetAllDiscount();
+        AllPointsPerMoney = PointsPerMoneyService.GetAllPointsPerMoney();
+        if (AllPointsPerMoney is not null && AllPointsPerMoney.ToList().Count > 0)
+        {
+            PointsPerMoney.PointsPerMoneyValue = PointsPerMoneyService.GetLastPointPerMoneySaved();
+        }
+        AllCurrency = CurrencyService.GetAllCurrency();
+        if (AllCurrency is not null && AllCurrency.ToList().Count>0)
+        {
+            IdCurrency = CurrencyService.GetLastCurrencySaved();
+        }
     }
 
-    public void DeleteCustomer(Customer c)
+    public void DeleteDiscount(int id)
     {
-        Context.Remove(c);
-        Context.SaveChanges();
+        Discount discountTodelete = DiscountService.GetDiscountById(id);
+        DiscountService.DeleteDiscount(discountTodelete);
     }
 
-    void CreateNewCustomer()
+    void CreateNewDiscount()
     {
-        NavigationManager.NavigateTo("/ccustomer");
+        NavigationManager.NavigateTo("/ddiscount");
     }
+
+    public void SavePointsperMoney(PointsPerMoney PointsPerMoney)
+    {
+        PointsPerMoneyService.CreatePointsPerMoney(PointsPerMoney);
+    }
+
+
+    public void CreateNewCurrency()
+    {
+        NavigationManager.NavigateTo("/ccurrency");
+    }
+    //async Task HandleSubmit()
+    //{
+
+    //}
 }

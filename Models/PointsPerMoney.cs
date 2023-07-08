@@ -11,7 +11,4 @@ public partial class PointsPerMoney
 
     public DateTime InsertDate { get; set; }
 
-    public int IdUserAdminInsert { get; set; }
-
-    public bool Deleted { get; set; }
 }

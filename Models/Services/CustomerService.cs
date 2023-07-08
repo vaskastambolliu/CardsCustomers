@@ -39,7 +39,7 @@ namespace CardsCustomers.Models.Services
             }
         }
 
-        public void UpdateCustomer(long id, Customer customer)
+        public void UpdateCustomer(int id, Customer customer)
         {
             try
             {
@@ -59,6 +59,27 @@ namespace CardsCustomers.Models.Services
             }
         }
 
+
+        public void UpdateCustomerWithoutRedirect(int id, Customer customer)
+        {
+
+            try
+            {
+                var local = _context.Set<Customer>().Local.FirstOrDefault(entry => entry.IdCustomer.Equals(customer.IdCustomer));
+                if (local != null)
+                {
+                    // detach
+                    _context.Entry(local).State = EntityState.Detached;
+                }
+                _context.Entry(customer).State = EntityState.Modified;
+                _context.SaveChanges();
+                //_navigationManager.NavigateTo("customers");
+            }
+            catch
+            {
+                throw;
+            }
+        }
         public Customer GetCustomerById(int? id)
         {
             try

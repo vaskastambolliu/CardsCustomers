@@ -24,33 +24,100 @@ else
 
 <EditForm Model="Customer" OnSubmit="HandleSubmit">
     <br />
-    <div>
-        <label for="Name">Name</label>
-        <InputText id="Name" @bind-Value="Customer.Name" class="form-control"></InputText>
+
+
+    <div class="row mt-3">
+        <label for="Name" class="col-sm-2 col-form-label">
+            Name
+        </label>
+        <div class="col-sm-4">
+            <InputText id="newvalue" class="form-control"
+                         @bind-Value="Customer.Name" />
+        </div>
     </div>
-    <div>
-        <label for="Surname">Surname</label>
-        <InputText id="Surname" @bind-Value="Customer.Surname" class="form-control"></InputText>
+
+
+
+
+
+    <div class="row mt-3">
+        <label for="Surname" class="col-sm-2 col-form-label">
+            Surname
+        </label>
+        <div class="col-sm-4">
+            <InputText id="Surname" class="form-control"
+                       @bind-Value="Customer.Surname" />
+        </div>
     </div>
-    <div>
-        <label for="DateOfBirth">DateOfBirth</label>
-        <InputDate id="DateOfBirth" @bind-Value="Customer.DateOfBirth" class="form-control"></InputDate>
+
+
+
+
+    <div class="row mt-3">
+        <label for="DateOfBirth" class="col-sm-2 col-form-label">
+            DateOfBirth
+        </label>
+        <div class="col-sm-4">
+            <InputDate id="DateOfBirth" class="form-control"
+                       @bind-Value="Customer.DateOfBirth" />
+        </div>
     </div>
-    <div>
-        <label for="Email">Email</label>
-        <InputText id="Email" @bind-Value="Customer.Email" class="form-control"></InputText>
+
+
+
+
+
+
+    <div class="row mt-3">
+        <label for="Email" class="col-sm-2 col-form-label">
+            Email
+        </label>
+        <div class="col-sm-4">
+            <InputText id="Email" class="form-control"
+                       @bind-Value="Customer.Email" />
+        </div>
     </div>
-    <div>
-        <label for="Phone">Phone</label>
-        <InputText id="Phone" @bind-Value="Customer.Phone" class="form-control"></InputText>
+
+
+
+
+
+    <div class="row mt-3">
+        <label for="Phone" class="col-sm-2 col-form-label">
+            Phone
+        </label>
+        <div class="col-sm-4">
+            <InputText id="Phone" class="form-control"
+                       @bind-Value="Customer.Phone" />
+        </div>
     </div>
-    <div>
-        <label for="TimeStampIdCard">Card Nr.</label>
-        <InputText id="TimeStampIdCard" @bind-Value="Customer.TimeStampIdCard" class="form-control" readonly="@true"></InputText>
+
+
+
+
+
+    <div class="row mt-3">
+        <label for="TimeStampIdCard" class="col-sm-2 col-form-label">
+            Card Nr.
+        </label>
+        <div class="col-sm-4">
+            <InputText id="TimeStampIdCard" class="form-control"
+                       @bind-Value="Customer.TimeStampIdCard" />
+        </div>
     </div>
-    <div>
-        <label for="Points">Points</label>
-        <InputNumber id="Points" @bind-Value="Customer.Points" class="form-control"></InputNumber>
+
+
+
+
+
+    <div class="row mt-3">
+        <label for="Points" class="col-sm-2 col-form-label">
+            Points
+        </label>
+        <div class="col-sm-4">
+            <InputNumber id="Points" class="form-control"
+                         @bind-Value="Customer.Points" />
+        </div>
     </div>
     <br />
     <button type="submit" class="btn btn-primary">@btnText</button>

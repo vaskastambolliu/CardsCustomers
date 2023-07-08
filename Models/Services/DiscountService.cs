@@ -32,9 +32,11 @@ namespace CardsCustomers.Models.Services
         {
             try
             {
+                discount.InsertDate = DateTime.Now;
+
                 _context.Discounts.Add(discount);
                 _context.SaveChanges();
-                //_navigationManager.NavigateTo("transactions");
+                _navigationManager.NavigateTo("discounts");
             }
             catch
             {
@@ -74,13 +76,14 @@ namespace CardsCustomers.Models.Services
                 throw;
             }
         }
-        public void DeleteDiscount(int id)
+        public void DeleteDiscount(Discount discount)
         {
             try
             {
-                Discount discount = _context.Discounts.Find(id);
+                //Discount discount = _context.Discounts.Find(id);
                 _context.Discounts.Remove(discount);
                 _context.SaveChanges();
+                _navigationManager.NavigateTo("/discounts");
             }
             catch
             {

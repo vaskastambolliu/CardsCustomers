@@ -46,6 +46,7 @@ namespace CardsCustomers.Models.Services
         {
             try
             {
+                transaction.InsertDate = DateTime.Now;
                 _context.Transactions.Add(transaction);
                 _context.SaveChanges();
                 _navigationManager.NavigateTo("transactions");
@@ -68,7 +69,7 @@ namespace CardsCustomers.Models.Services
                 }
                 _context.Entry(transaction).State = EntityState.Modified;
                 _context.SaveChanges();
-                _navigationManager.NavigateTo("customers");
+                _navigationManager.NavigateTo("transactions");
             }
             catch
             {
@@ -102,14 +103,6 @@ namespace CardsCustomers.Models.Services
             }
         }
 
-
-
-        //public async Task<Department> GetDepartment(int departmentId)
-        //{
-        //    return await appDbContext.Departments
-        //        .FirstOrDefaultAsync(d => d.DepartmentId == departmentId);
-        //}
-
         public async Task<IEnumerable<Customer>> GetCustomers()
         {
             return await _context.Customers.ToListAsync();
@@ -118,43 +111,6 @@ namespace CardsCustomers.Models.Services
         {
             return await _context.Discounts.ToListAsync();
         }
-
-
-        //public List<SelectListItem> ListOfCustomers()
-        //{
-        //    List<SelectListItem> ListCustomers = new List<SelectListItem>();
-
-        //    //you can refer to the following code to get the select options from the database.  
-        //    ListCustomers = (from d in _context.Customers
-        //                     orderby d.IdCustomer
-        //                     where d.Deleted == false
-        //                     select new SelectListItem
-        //                     {
-        //                         Text = d.Name,
-        //                         Value = Convert.ToString(d.IdCustomer)
-        //                     }).OrderBy(x => x.Value).ToList();
-        //    ListCustomers.Insert(0, new SelectListItem { Text = "<- Select ->", Value = "-1" });
-
-        //    return ListCustomers;
-        //}
-
-
-        //public List<SelectListItem> ListOfDiscounts()
-        //{
-        //    List<SelectListItem> ListDiscounts = new List<SelectListItem>();
-        //    ListDiscounts = (from d in _context.Discounts
-        //                     orderby d.IdDiscount
-        //                     where d.Deleted == false
-        //                     select new SelectListItem
-        //                     {
-        //                         Text = d.DiscountName,
-        //                         Value = Convert.ToString(d.IdDiscount)
-        //                     }).OrderBy(x => x.Value).ToList();
-        //    ListDiscounts.Insert(0, new SelectListItem { Text = "<- Select ->", Value = "-1" });
-
-        //    return ListDiscounts;
-        //}
-
 
         public class TransactionWithDetail
         {

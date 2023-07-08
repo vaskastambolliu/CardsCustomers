@@ -17,7 +17,7 @@ public partial class Transaction
 
     public int? Discount { get; set; }
 
-    public int? NewValue { get; set; }
+    public decimal? NewValue { get; set; }
 
     public int? Balance { get; set; }
 
@@ -26,4 +26,5 @@ public partial class Transaction
     public int IdUserAdmin { get; set; }
 
     public bool? Deleted { get; set; }
+    public int? PointsFromCurTrans { get; set; }
 }

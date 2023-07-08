@@ -5,21 +5,21 @@ using System;
 
 namespace CardsCustomers.Models.Services
 {
-    public class PointsPeMoneyService : IPointsPerMoneyService
+    public class CurrencyService : ICurrencyService
     {
         private readonly NavigationManager _navigationManager;
         private DbCoreloginContext _context;
-        public PointsPeMoneyService(DbCoreloginContext context, NavigationManager navigationManager)
+        public CurrencyService(DbCoreloginContext context, NavigationManager navigationManager)
         {
             _context = context;
             _navigationManager = navigationManager;
         }
 
-        public IEnumerable<PointsPerMoney> GetAllPointsPerMoney()
+        public IEnumerable<Currency> GetAllCurrency()
         {
             try
             {
-                var result = _context.PointsPerMoneys.ToList();
+                var result = _context.Currencies.ToList();
                 return result;
 
             }
@@ -29,13 +29,13 @@ namespace CardsCustomers.Models.Services
             }
         }
 
-        public void CreatePointsPerMoney(PointsPerMoney pointsPerMoney)
+        public void CreateCurrency(Currency currency)
         {
             try
             {
-                _context.PointsPerMoneys.Add(pointsPerMoney);
+                _context.Currencies.Add(currency);
                 _context.SaveChanges();
-                //_navigationManager.NavigateTo("transactions");
+                _navigationManager.NavigateTo("discounts");
             }
             catch
             {
@@ -43,17 +43,17 @@ namespace CardsCustomers.Models.Services
             }
         }
 
-        public void UpdatePointsPerMoney(int id, PointsPerMoney pointsPerMoney)
+        public void UpdateCurrency(int id, Currency currency)
         {
             try
             {
-                var local = _context.Set<PointsPerMoney>().Local.FirstOrDefault(entry => entry.IdPointsPerMoney.Equals(pointsPerMoney.IdPointsPerMoney));
+                var local = _context.Set<Currency>().Local.FirstOrDefault(entry => entry.IdCurrency.Equals(currency.IdCurrency));
                 if (local != null)
                 {
                     // detach
                     _context.Entry(local).State = EntityState.Detached;
                 }
-                _context.Entry(pointsPerMoney).State = EntityState.Modified;
+                _context.Entry(currency).State = EntityState.Modified;
                 _context.SaveChanges();
                 //_navigationManager.NavigateTo("customers");
             }
@@ -63,24 +63,24 @@ namespace CardsCustomers.Models.Services
             }
         }
 
-        public PointsPerMoney GetPointsPerMoneyById(int? id)
+        public Currency GetCurrencyById(int? id)
         {
             try
             {
-                PointsPerMoney pointspermoney = _context.PointsPerMoneys.Find(id);
-                return pointspermoney;
+                Currency currency = _context.Currencies.Find(id);
+                return currency;
             }
             catch
             {
                 throw;
             }
         }
-        public void DeletePointsPerMoney(int id)
+        public void DeleteCurrency(int id)
         {
             try
             {
-                PointsPerMoney pointspermoney = _context.PointsPerMoneys.Find(id);
-                _context.PointsPerMoneys.Remove(pointspermoney);
+                Currency currency = _context.Currencies.Find(id);
+                _context.Currencies.Remove(currency);
                 _context.SaveChanges();
             }
             catch
@@ -89,12 +89,12 @@ namespace CardsCustomers.Models.Services
             }
         }
 
-        public decimal GetLastPointPerMoneySaved()
+        public int GetLastCurrencySaved()
         {
             try
             {
-                decimal lastPointsPerMoney = Convert.ToDecimal(_context.PointsPerMoneys.OrderBy(x => x.IdPointsPerMoney).FirstOrDefault().PointsPerMoneyValue);
-                return lastPointsPerMoney;
+                int lastCurrency = _context.Currencies.OrderBy(x => x.IdCurrency).LastOrDefault().IdCurrency;
+                return lastCurrency;
             }
             catch
             {

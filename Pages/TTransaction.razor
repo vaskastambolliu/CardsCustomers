@@ -26,7 +26,7 @@ else
     <h3 class="text-center">Edit Transaction</h3>
 }
 
-<EditForm Model="Transaction" OnSubmit="HandleSubmit">
+<EditForm Model="Transaction" OnSubmit="HandleValidSubmit">
 
     <hr />
 
@@ -34,10 +34,13 @@ else
         <label for="client" class="col-sm-2 col-form-label">Client</label>
         <div class="col-sm-4">
             <InputSelect id="client" @bind-Value="Transaction.IdCustomer" @oninput="CustomerFromDdw" class="form-select">
+                
                 <option value="-1"> -- Select -- </option>
+            
                 @foreach (var cust in CustomerList)
                 {
-                    <option value="@cust.IdCustomer">@cust.Name</option>
+                    var customerInfo = @cust.Name + " " + @cust.Surname;
+                    <option value="@cust.IdCustomer">@customerInfo</option>
                 }
 
             </InputSelect>
@@ -71,6 +74,9 @@ else
                          @bind-Value="Transaction.Purchase" @oninput="CalculateDiscount"
                          required="@true" />
         </div>
+        <div class="col-sm-4">
+            <button type="submit" class="btn btn-primary" @onclick="@(() => CalculatePointsNoDisc())">Calculate Points Without Discount</button>
+        </div>
     </div>
 
     <div class="row mt-3">
@@ -82,7 +88,8 @@ else
                 <option value="-1"> -- Select -- </option>
                 @foreach (var disc in DiscountList)
                 {
-                    <option value="@disc.IdDiscount">@disc.DiscountName</option>
+                    var element = @disc.DiscountName + " - " +@disc.PointsNeeded + " Points Nedded";
+                    <option value="@disc.IdDiscount">@element</option>
                 }
 
             </InputSelect>
@@ -93,7 +100,7 @@ else
         </label>
         <div class="col-sm-2">
             <InputNumber id="points" class="form-control"
-                         @bind-Value="@PointOfCurrentTransaction" readonly="@true" />
+                         @bind-Value="Transaction.PointsFromCurTrans" readonly="@true" />
         </div>
     </div>
 
@@ -103,7 +110,7 @@ else
         </label>
         <div class="col-sm-4">
             <InputNumber id="newvalue" class="form-control"
-                         @bind-Value="Transaction.NewValue" />
+                         @bind-Value="Transaction.NewValue" readonly="@true" />
         </div>
     </div>
 
@@ -113,10 +120,11 @@ else
         </label>
         <div class="col-sm-4">
             <InputNumber id="balance" class="form-control"
-                         @bind-Value="Transaction.Balance"  />
+                         @bind-Value="Transaction.Balance" readonly="@true" />
         </div>
     </div>
     <div class="col-sm-2 row mt-3"> <button type="submit" class="btn btn-primary">@btnText</button></div>
+
 
 </EditForm>
 
@@ -126,7 +134,6 @@ else
     public int? Id { get; set; }
 
     string btnText = string.Empty;
-    int PointOfCurrentTransaction = 0;
     [Inject]
     DbCoreloginContext Context { get; set; }
     Transaction Transaction = new Transaction();
@@ -134,8 +141,6 @@ else
     public List<Customer> CustomerList { get; set; } = new List<Customer>();
     public IEnumerable<Discount> DiscountList { get; set; } = new List<Discount>();
 
-    public string IdCustomer { get; set; }
-    public string IdDiscount { get; set; }
     private string IdCustomerValueDdw { get; set; }
 
     protected override async Task OnParametersSetAsync()
@@ -158,13 +163,18 @@ else
         btnText = Id == null ? "Save new Transaction" : "Update Transaction";
 
         CustomerList = (await TransactionService.GetCustomers()).ToList();
-        IdCustomer = Transaction.IdCustomer.ToString();
+
+
+        if (Id is not null)
+        {
+            DiscountList = DiscountService.GetAllDiscount().ToList();
+        }
     }
 
     public string FormSubmitMessage { get; set; } = "Form Data Not Submitted";
 
 
-    async Task HandleSubmit()
+    async Task HandleValidSubmit()
     {
         if (Id is null)
         {
@@ -210,8 +220,6 @@ else
                 int Purchase = Convert.ToInt32(args.Value);
                 decimal? PointsEarnedFromLastPurchase = 0;
                 decimal lastpointssaved = 0;
-                //int? pointfromobj = Transaction.Points;
-
                 var pointspermoney = PointsPerMoneyService.GetAllPointsPerMoney();
                 if (pointspermoney is null)
                 {
@@ -223,12 +231,10 @@ else
                     if (lastpointssaved != null)
                     {
                         PointsEarnedFromLastPurchase = lastpointssaved * Purchase;
-                        //var points = PointsEarnedFromLastPurchase + pointfromobj;
-                        PointOfCurrentTransaction = Convert.ToInt32(PointsEarnedFromLastPurchase);
-                        //Transaction.Points = Convert.ToInt32(points);
+                        Transaction.PointsFromCurTrans = Convert.ToInt32(PointsEarnedFromLastPurchase);
                     }
                     DiscountList = DiscountService.GetAllDiscount().ToList().Where(x => x.PointsNeeded <= Purchase);
-                    IdDiscount = Transaction.Discount.ToString();
+
                 }
 
 
@@ -246,13 +252,59 @@ else
 
     public void DiscountFromDdw(ChangeEventArgs args)
     {
-        string discount = Convert.ToString(args.Value);
+        var Iddiscount = Convert.ToString(args.Value);
+        Discount discount = DiscountService.GetDiscountById(Convert.ToInt32(Iddiscount));
+        Customer customer = CustomerService.GetCustomerById(Transaction.IdCustomer);
+        Transaction.Points = customer.Points;
+        decimal discountPercent = Convert.ToDecimal(discount.DiscountPercent) / 100;
 
+        var cmimiaktual = Transaction.Purchase;
+        var skontoezgjedhur = discountPercent; //%
+                                               //var NewValueprice = (cmimiaktual * (1 - discountPercent));
+        var valueToDiscount = cmimiaktual * discountPercent;
 
-        //DiscountList = DiscountService.GetAllDiscount(Transaction.Purchase).ToList();
-        //IdDiscount = Transaction.Discount.ToString();
+        Transaction.NewValue = Transaction.Purchase - Convert.ToDecimal(valueToDiscount);
+        var pointdiscountedOfCurTrans = Transaction.PointsFromCurTrans - discount.PointsNeeded;
+        Transaction.Balance = Transaction.Points + pointdiscountedOfCurTrans;
+
+        //must update the customer points
+        customer.Points = Transaction.Balance;
+        CustomerService.UpdateCustomerWithoutRedirect(customer.IdCustomer, customer);
+
     }
 
+
+    public void CalculatePointsNoDisc()
+    {
+        if (Transaction.Purchase is not null)
+        {
+            decimal? PointsEarnedFromLastPurchase = 0;
+            decimal lastpointssaved = 0;
+            var pointspermoney = PointsPerMoneyService.GetAllPointsPerMoney();//control that exist at least one row 
+            if (pointspermoney is null)
+            {
+
+            }
+            else
+            {
+                lastpointssaved = PointsPerMoneyService.GetLastPointPerMoneySaved();
+                if (lastpointssaved != null)
+                {
+                    PointsEarnedFromLastPurchase = lastpointssaved * Transaction.Purchase;
+                    Transaction.PointsFromCurTrans = Convert.ToInt32(PointsEarnedFromLastPurchase);
+                    Transaction.Balance =Convert.ToInt32(PointsEarnedFromLastPurchase) + Transaction.Points;
+                    Customer customer = CustomerService.GetCustomerById(Transaction.IdCustomer);
+                    //must update the customer points
+                    customer.Points = Transaction.Balance;
+                    CustomerService.UpdateCustomerWithoutRedirect(customer.IdCustomer, customer);
+                    NavigationManager.NavigateTo("/ttransaction");
+                }
+
+
+            }
+        }
+
+    }
     //public void HandleValidSubmit()
     //{
     //    btnText = Id == null ? "Save new Customer" : "Update Customer";
