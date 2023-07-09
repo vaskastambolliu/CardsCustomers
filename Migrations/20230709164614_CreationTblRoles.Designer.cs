@@ -4,6 +4,7 @@ using CardsCustomers.Models.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CardsCustomers.Migrations
 {
     [DbContext(typeof(DbCoreloginContext))]
-    partial class DbCoreloginContextModelSnapshot : ModelSnapshot
+    [Migration("20230709164614_CreationTblRoles")]
+    partial class CreationTblRoles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -305,9 +308,6 @@ namespace CardsCustomers.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DiscountPercent")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("IdUserAdmin")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("InsertDate")

@@ -37,7 +37,7 @@ else
             @foreach (@TransactionService.TransactionWithDetail transaction in AllTransactions)
             {
                 <tr>
-                    <td><a class="btn btn-sm btn-warning" href="/ttransaction/@transaction.transaction.IdTransaction">Edit</a></td>
+                    <td><a class="btn btn-sm btn-warning" href="/ttransaction/@transaction.transaction.IdTransaction">View</a></td>
                     <td>@Convert.ToString(@transaction.customer.Name)</td>
                     <td>@Convert.ToString(@transaction.customer.Surname)</td>
                     <td>@transaction.transaction.InsertDate.ToShortDateString()</td>
@@ -47,7 +47,7 @@ else
                     <td>@Convert.ToInt32(@transaction.customer.Points)</td>
                     <td>
                         <button class="btn btn-sm btn-danger"
-                        @onclick="@(() => DeleteTransaction(transaction.transaction))">
+                        @onclick="@(() => DeleteTransaction(transaction.transaction.IdTransaction))">
                             Delete
                         </button>
                     </td>
@@ -59,18 +59,15 @@ else
 }
 
 @code {
-    [Inject]
-    DbCoreloginContext Context { get; set; }
     public IEnumerable<dynamic> AllTransactions { get; set; }
     protected override void OnInitialized()
     {
         AllTransactions = TransactionService.GetAllTransactions().ToList();
     }
 
-    public void DeleteTransaction(Transaction c)
+    public void DeleteTransaction(int id)
     {
-        Context.Remove(c);
-        Context.SaveChanges();
+        TransactionService.DeleteTransaction(id);
     }
 
     void CreateNewTransaction()

@@ -1,0 +1,66 @@
+﻿@page "/usersroles"
+@using CardsCustomers.Models.Services;
+@using CardsCustomers.Models;
+@inject IUserRoleService UserRoleService
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>User Role</PageTitle>
+
+<h1>User Role</h1>
+
+<p>This is the list of registrated User Role.</p>
+<br/>
+<button class="btn btn-sm  btn-primary" @onclick="@(() => CreateNewUserRole())">Create User Role</button>
+<br />
+@if (AllUserRoles == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Role</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (UserRole userrole in AllUserRoles)
+            {
+                <tr>
+                    <td><a class="btn btn-sm btn-warning" href="/uuserrole/@userrole.IdUserRole">Edit</a></td>
+                    <td>@userrole.Role</td>
+ 
+                    <td>
+                        <button class="btn btn-sm btn-danger"
+                        @onclick="@(() => DeleteUserRole(userrole.IdUserRole))">
+                            Delete
+                        </button>
+                    </td>
+                   
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    public IEnumerable<UserRole> AllUserRoles { get; set; }
+    protected override void OnInitialized()
+    {
+        AllUserRoles = UserRoleService.GetAllUserRole();
+    }
+
+    public void DeleteUserRole(int id)
+    {
+        UserRoleService.DeleteUserRole(id);
+    }
+
+    void CreateNewUserRole()
+    {
+        NavigationManager.NavigateTo("/uuserrole");
+    }
+}

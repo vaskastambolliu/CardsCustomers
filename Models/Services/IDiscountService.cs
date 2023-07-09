@@ -7,7 +7,7 @@
         void CreateDiscount(Discount discount);
         void UpdateDiscount(int id, Discount discount);
         Discount GetDiscountById(int? id);
-        void DeleteDiscount(Discount discount);
+        void DeleteDiscount(int id);
 
     }
 }

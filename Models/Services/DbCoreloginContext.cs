@@ -38,6 +38,7 @@ public partial class DbCoreloginContext : DbContext
     public virtual DbSet<Transaction> Transactions { get; set; }
 
     public virtual DbSet<UserAdmin> UserAdmins { get; set; }
+    public virtual DbSet<UserRole> UserRole { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     { }
@@ -174,6 +175,13 @@ public partial class DbCoreloginContext : DbContext
             entity.ToTable("UserAdmin");
 
             entity.Property(e => e.Password).HasMaxLength(100);
+        });
+        modelBuilder.Entity<UserRole>(entity =>
+        {
+            entity.HasKey(e => e.IdUserRole);
+
+            entity.ToTable("UserRole");
+
         });
 
         OnModelCreatingPartial(modelBuilder);

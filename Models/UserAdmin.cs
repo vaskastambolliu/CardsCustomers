@@ -22,4 +22,5 @@ public partial class UserAdmin
     public DateTime InsertDate { get; set; }
 
     public DateTime ChangePasswordDate { get; set; }
+    public int IdUserRole { get; set; }
 }

@@ -14,4 +14,5 @@ public partial class Discount
     public int DiscountPercent { get; set; }
 
     public DateTime InsertDate { get; set; }
+    public int? IdUserAdmin { get; set; }
 }

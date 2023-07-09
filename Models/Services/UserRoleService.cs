@@ -1,24 +1,25 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace CardsCustomers.Models.Services
 {
-    public class DiscountService :IDiscountService
+    public class UserRoleService : IUserRoleService
     {
-
         private readonly NavigationManager _navigationManager;
         private DbCoreloginContext _context;
-        public DiscountService(DbCoreloginContext context, NavigationManager navigationManager)
+        public UserRoleService(DbCoreloginContext context, NavigationManager navigationManager)
         {
             _context = context;
             _navigationManager = navigationManager;
         }
 
-        public IEnumerable<Discount> GetAllDiscount()
+        public IEnumerable<UserRole> GetAllUserRole()
         {
             try
             {
-                var result = _context.Discounts.ToList();
+                var result = _context.UserRole.ToList();
                 return result;
 
             }
@@ -28,15 +29,14 @@ namespace CardsCustomers.Models.Services
             }
         }
 
-        public void CreateDiscount(Discount discount)
+        public void CreateUserRole(UserRole userrole)
         {
             try
             {
-                discount.InsertDate = DateTime.Now;
-
-                _context.Discounts.Add(discount);
+                userrole.InsertDate = DateTime.Now;
+                _context.UserRole.Add(userrole);
                 _context.SaveChanges();
-                _navigationManager.NavigateTo("discounts");
+                _navigationManager.NavigateTo("usersroles");
             }
             catch
             {
@@ -44,17 +44,17 @@ namespace CardsCustomers.Models.Services
             }
         }
 
-        public void UpdateDiscount(int id, Discount discount)
+        public void UpdateUserRole(int id, UserRole userrole)
         {
             try
             {
-                var local = _context.Set<Discount>().Local.FirstOrDefault(entry => entry.IdDiscount.Equals(discount.IdDiscount));
+                var local = _context.Set<UserRole>().Local.FirstOrDefault(entry => entry.IdUserRole.Equals(userrole.IdUserRole));
                 if (local != null)
                 {
                     // detach
                     _context.Entry(local).State = EntityState.Detached;
                 }
-                _context.Entry(discount).State = EntityState.Modified;
+                _context.Entry(userrole).State = EntityState.Modified;
                 _context.SaveChanges();
                 //_navigationManager.NavigateTo("customers");
             }
@@ -64,27 +64,25 @@ namespace CardsCustomers.Models.Services
             }
         }
 
-        public Discount GetDiscountById(int? id)
+        public UserRole GetUserRoleById(int? id)
         {
             try
             {
-                Discount discount = _context.Discounts.Find(id);
-                return discount;
+                UserRole userrole = _context.UserRole.Find(id);
+                return userrole;
             }
             catch
             {
                 throw;
             }
         }
-        public void DeleteDiscount(int id)
+        public void DeleteUserRole(int id)
         {
             try
             {
-                //Discount discount = _context.Discounts.Find(id);
-                Discount discountToDelete = _context.Discounts.Find(id);
-                _context.Discounts.Remove(discountToDelete);
+                UserRole userrole = _context.UserRole.Find(id);
+                _context.UserRole.Remove(userrole);
                 _context.SaveChanges();
-                _navigationManager.NavigateTo("/discounts");
             }
             catch
             {
@@ -92,6 +90,6 @@ namespace CardsCustomers.Models.Services
             }
         }
 
-
+      
     }
 }

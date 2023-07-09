@@ -76,7 +76,7 @@ else
     </div>
 
 
-    <div class="row mt-3">
+ @*   <div class="row mt-3">
         <label for="client" class="col-sm-2 col-form-label">Currency</label>
         <div class="col-sm-2">
             <InputSelect id="currency" @bind-Value="@IdCurrency"  class="form-select">
@@ -94,8 +94,8 @@ else
         <div class="col-sm-2">
             <a class="btn btn-sm  btn-primary" href="/ccurrency">Create Currency</a>
           @*  <button type="submit" @onclick="@(() => CreateNewCurrency())" class="btn btn-success">Create Currency</button>*@
-        </div>
-    </div>
+@*        </div>
+    </div>*@
 
 </EditForm>
 
@@ -123,8 +123,7 @@ else
 
     public void DeleteDiscount(int id)
     {
-        Discount discountTodelete = DiscountService.GetDiscountById(id);
-        DiscountService.DeleteDiscount(discountTodelete);
+        DiscountService.DeleteDiscount(id);
     }
 
     void CreateNewDiscount()
@@ -138,10 +137,10 @@ else
     }
 
 
-    public void CreateNewCurrency()
-    {
-        NavigationManager.NavigateTo("/ccurrency");
-    }
+    //public void CreateNewCurrency()
+    //{
+    //    NavigationManager.NavigateTo("/ccurrency");
+    //}
     //async Task HandleSubmit()
     //{
 

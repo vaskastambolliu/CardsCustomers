@@ -17,7 +17,7 @@
 <br />
 @if (Id is null)
 {
-    <PageTitle>Create a new Transaction </PageTitle>
+    <PageTitle>Create a new Transaction </PageTitle>   
     <h3 class="text-center">Create a New Transaction</h3>
 }
 else
@@ -33,7 +33,8 @@ else
     <div class="row mt-3">
         <label for="client" class="col-sm-2 col-form-label">Client</label>
         <div class="col-sm-4">
-            <InputSelect id="client" @bind-Value="Transaction.IdCustomer" @oninput="CustomerFromDdw" class="form-select">
+            <InputSelect id="client" @bind-Value="Transaction.IdCustomer" disabled=@IsInViewMode @oninput="CustomerFromDdw"
+                         class="form-select">
                 
                 <option value="-1"> -- Select -- </option>
             
@@ -61,21 +62,18 @@ else
             Points
         </label>
         <div class="col-sm-4">
-            <InputNumber id="points" class="form-control"
-                         @bind-Value="Transaction.Points" readonly="@true" />
+            <InputNumber id="points" class="form-control" readonly="@IsInViewMode"
+                         @bind-Value="Transaction.Points"  />
         </div>
     </div>
     <div class="row mt-3">
         <label for="purchase" class="col-sm-2 col-form-label">
             Purchase
         </label>
-        <div class="col-sm-4">
-            <InputNumber id="purchase" class="form-control"
+        <div class="col-sm-4"> 
+            <InputNumber id="purchase" class="form-control" readonly="@IsInViewMode"
                          @bind-Value="Transaction.Purchase" @oninput="CalculateDiscount"
                          required="@true" />
-        </div>
-        <div class="col-sm-4">
-            <button type="submit" class="btn btn-primary" @onclick="@(() => CalculatePointsNoDisc())">Calculate Points Without Discount</button>
         </div>
     </div>
 
@@ -84,7 +82,7 @@ else
             Discount
         </label>
         <div class="col-sm-4">
-            <InputSelect id="discount" @bind-Value="Transaction.Discount" @oninput="DiscountFromDdw" class="form-select">
+            <InputSelect id="discount" @bind-Value="Transaction.Discount" disabled=@IsInViewMode @oninput="DiscountFromDdw" class="form-select">
                 <option value="-1"> -- Select -- </option>
                 @foreach (var disc in DiscountList)
                 {
@@ -99,7 +97,7 @@ else
             Points of This Purchase
         </label>
         <div class="col-sm-2">
-            <InputNumber id="points" class="form-control"
+            <InputNumber id="points" class="form-control" 
                          @bind-Value="Transaction.PointsFromCurTrans" readonly="@true" />
         </div>
     </div>
@@ -123,7 +121,7 @@ else
                          @bind-Value="Transaction.Balance" readonly="@true" />
         </div>
     </div>
-    <div class="col-sm-2 row mt-3"> <button type="submit" class="btn btn-primary">@btnText</button></div>
+    <div class="col-sm-2 row mt-3"> <button type="submit" class="btn btn-primary" disabled=@IsInViewMode>@btnText</button></div>
 
 
 </EditForm>
@@ -140,6 +138,7 @@ else
     public IEnumerable<Transaction> AllTransactions { get; set; }
     public List<Customer> CustomerList { get; set; } = new List<Customer>();
     public IEnumerable<Discount> DiscountList { get; set; } = new List<Discount>();
+    public bool IsInViewMode { get; set; }
 
     private string IdCustomerValueDdw { get; set; }
 
@@ -147,6 +146,7 @@ else
     {
         if (Id is not null)
         {
+            IsInViewMode = true;
             var result = TransactionService.GetTransactionById(Id);
             if (result is not null)
             {
@@ -156,6 +156,10 @@ else
             {
                 NavigationManager.NavigateTo("/ttransaction");
             }
+        }
+        else
+        {
+            IsInViewMode = false;
         }
     }
     protected async override Task OnInitializedAsync()
@@ -232,6 +236,7 @@ else
                     {
                         PointsEarnedFromLastPurchase = lastpointssaved * Purchase;
                         Transaction.PointsFromCurTrans = Convert.ToInt32(PointsEarnedFromLastPurchase);
+                        Transaction.Balance = Transaction.PointsFromCurTrans + Transaction.Points;
                     }
                     DiscountList = DiscountService.GetAllDiscount().ToList().Where(x => x.PointsNeeded <= Purchase);
 
@@ -252,6 +257,10 @@ else
 
     public void DiscountFromDdw(ChangeEventArgs args)
     {
+        if (args.Value.ToString()!= "-1")
+        {
+            Transaction.PointsFromCurTrans = 0;
+        }
         var Iddiscount = Convert.ToString(args.Value);
         Discount discount = DiscountService.GetDiscountById(Convert.ToInt32(Iddiscount));
         Customer customer = CustomerService.GetCustomerById(Transaction.IdCustomer);
@@ -274,37 +283,7 @@ else
     }
 
 
-    public void CalculatePointsNoDisc()
-    {
-        if (Transaction.Purchase is not null)
-        {
-            decimal? PointsEarnedFromLastPurchase = 0;
-            decimal lastpointssaved = 0;
-            var pointspermoney = PointsPerMoneyService.GetAllPointsPerMoney();//control that exist at least one row 
-            if (pointspermoney is null)
-            {
-
-            }
-            else
-            {
-                lastpointssaved = PointsPerMoneyService.GetLastPointPerMoneySaved();
-                if (lastpointssaved != null)
-                {
-                    PointsEarnedFromLastPurchase = lastpointssaved * Transaction.Purchase;
-                    Transaction.PointsFromCurTrans = Convert.ToInt32(PointsEarnedFromLastPurchase);
-                    Transaction.Balance =Convert.ToInt32(PointsEarnedFromLastPurchase) + Transaction.Points;
-                    Customer customer = CustomerService.GetCustomerById(Transaction.IdCustomer);
-                    //must update the customer points
-                    customer.Points = Transaction.Balance;
-                    CustomerService.UpdateCustomerWithoutRedirect(customer.IdCustomer, customer);
-                    NavigationManager.NavigateTo("/ttransaction");
-                }
-
-
-            }
-        }
-
-    }
+    
     //public void HandleValidSubmit()
     //{
     //    btnText = Id == null ? "Save new Customer" : "Update Customer";
