@@ -7,62 +7,68 @@
 
 <PageTitle>Customers</PageTitle>
 
-<h1>Customers</h1>
+<AuthorizeView>
+    <Authorized>
+        <h1>Customers</h1>
 
-<p>This is the list of registrated Customers.</p>
-<br/>
-<button class="btn btn-sm  btn-primary" @onclick="@(() => CreateNewCustomer())">Create Customer</button>
-<br />
-@if (AllCustomers == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th></th>
-                <th>Name</th>
-                <th>Surname</th>
-                <th>Birth Date</th>
-                <th>E-Mail</th>
-                <th>Phone</th>
-                <th>Card</th>
-                <th>Points</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (Customer customer in AllCustomers)
-            {
-                <tr>
-                    <td><a class="btn btn-sm btn-warning" href="/CCustomer/@customer.IdCustomer">Edit</a></td>
-                    <td>@customer.Name</td>
-                    <td>@customer.Surname</td>
-                    <td>@customer.DateOfBirth.ToShortDateString()</td>
-                    <td>@customer.Email</td>
-                    <td>@customer.Phone</td>
-                    <td>@customer.TimeStampIdCard</td>
-                    <td>@customer.Points</td>
-                    @*<td class="text-right">*@
-                     @*   <a class="btn btn-primary btn-sm" href="/players/detail/@item.Id" role="button">Details</a>
-                        <a class="btn btn-secondary btn-sm" href="/players/edit/@item.Id" role="button">Edit</a>*@
-                        @*<button class="btn btn-danger btn-sm" @onclick="@(e => DeleteCustomer(item.Id))" role="button">Delete</button>*@
-                  @*  </td>*@
-                    <td>
-                        <button class="btn btn-sm btn-danger"
-                        @onclick="@(() => DeleteCustomer(customer))">
-                            Delete
-                        </button>
-                    </td>
-                   
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+        <p>This is the list of registrated Customers.</p>
+        <br />
+        <button class="btn btn-sm  btn-primary" @onclick="@(() => CreateNewCustomer())">Create Customer</button>
+        <br />
+        @if (AllCustomers == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Surname</th>
+                        <th>Birth Date</th>
+                        <th>E-Mail</th>
+                        <th>Phone</th>
+                        <th>Card</th>
+                        <th>Points</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Customer customer in AllCustomers)
+                    {
+                        <tr>
+                            <td><a class="btn btn-sm btn-warning" href="/CCustomer/@customer.IdCustomer">Edit</a></td>
+                            <td>@customer.Name</td>
+                            <td>@customer.Surname</td>
+                            <td>@customer.DateOfBirth.ToShortDateString()</td>
+                            <td>@customer.Email</td>
+                            <td>@customer.Phone</td>
+                            <td>@customer.TimeStampIdCard</td>
+                            <td>@customer.Points</td>
+                            @*<td class="text-right">*@
+                            @*   <a class="btn btn-primary btn-sm" href="/players/detail/@item.Id" role="button">Details</a>
+                    <a class="btn btn-secondary btn-sm" href="/players/edit/@item.Id" role="button">Edit</a>*@
+                            @*<button class="btn btn-danger btn-sm" @onclick="@(e => DeleteCustomer(item.Id))" role="button">Delete</button>*@
+                            @*  </td>*@
+                            <td>
+                                <button class="btn btn-sm btn-danger"
+                                @onclick="@(() => DeleteCustomer(customer))">
+                                    Delete
+                                </button>
+                            </td>
 
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p role="status">You are not authorized to see this component</p>
+    </NotAuthorized>
+</AuthorizeView>
 @code {
     [Inject]
     DbCoreloginContext Context { get; set; }

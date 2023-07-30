@@ -8,10 +8,23 @@
     </div>
 
     <main>
-      @*  <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>*@
-
+        <AuthorizeView>
+            <NotAuthorized>
+                <div class="top-row px-4">
+                    <a href="Identity/Account/Login" target="_blank">Login</a>
+                    <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+        <AuthorizeView>
+            <Authorized>
+                <div class="top-row px-4">
+                    <a> Welcome @context.User.Identity.Name</a>
+                    <a href="Identity/Account/Logout" target="_blank">Logout</a>
+                    <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+                </div>
+            </Authorized>
+        </AuthorizeView>
         <article class="content px-4">
             @Body
         </article>

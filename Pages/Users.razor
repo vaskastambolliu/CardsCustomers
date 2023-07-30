@@ -1,0 +1,77 @@
+﻿@page "/Users"
+@using CardsCustomers.Models.Services;
+@using CardsCustomers.Models;
+@using Microsoft.AspNetCore.Http.Extensions;
+@inject IUserAdminService UserAdminService
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Users</PageTitle>
+
+<h1>Users</h1>
+
+<p>This is the list of registrated Users.</p>
+<br />
+<button class="btn btn-sm  btn-primary" @onclick="@(() => CreateNewUser())">Create User</button>
+<br />
+@if (AllUsers == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>User</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (UserAdmin useradmin in AllUsers)
+            {
+                <tr>
+                    <td>
+                        <button class="btn btn-sm btn-warning"
+                        @onclick="@(() => ViewUser(useradmin.IdUserAdmin))">
+                            View
+                        </button>
+                        @*<a class="btn btn-sm btn-warning" href="/Identity/Account/Register/@useradmin.IdUserAdmin">Edit</a>*@
+                    </td>
+                    <td>@useradmin.Name   @useradmin.Surname</td>
+
+                    <td>
+                        <button class="btn btn-sm btn-danger"
+                        @onclick="@(() => DeleteUser(useradmin.IdUserAdmin))">
+                            Delete
+                        </button>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    public IEnumerable<UserAdmin> AllUsers { get; set; }
+    protected override void OnInitialized()
+    {
+        AllUsers = UserAdminService.GetAllUserAdmin();
+    }
+
+    public void DeleteUser(int id)
+    {
+        UserAdminService.DeleteUserAdmin(id);
+    }
+    public void ViewUser(int id)
+    {
+        NavigationManager.NavigateTo("/Identity/Account/Register?id="+id, true);
+    }
+
+    void CreateNewUser()
+    {
+        NavigationManager.NavigateTo("/Identity/Account/Register", true);
+    }
+}

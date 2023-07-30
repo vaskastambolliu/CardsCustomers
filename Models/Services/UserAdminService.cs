@@ -15,6 +15,10 @@ namespace CardsCustomers.Models.Services
             _navigationManager = navigationManager;
         }
 
+        public UserAdminService(DbCoreloginContext context)
+        {
+            _context = context;
+        }
         public IEnumerable<UserAdmin> GetAllUserAdmin()
         {
             try
