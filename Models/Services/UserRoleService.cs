@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Security.Cryptography;
 
 namespace CardsCustomers.Models.Services
 {
@@ -13,6 +14,10 @@ namespace CardsCustomers.Models.Services
         {
             _context = context;
             _navigationManager = navigationManager;
+        }
+        public UserRoleService(DbCoreloginContext context)
+        {
+            _context = context;
         }
 
         public IEnumerable<UserRole> GetAllUserRole()
@@ -76,6 +81,19 @@ namespace CardsCustomers.Models.Services
                 throw;
             }
         }
+
+        public string GetUserRoleNameById(int? id)
+        {
+            try
+            {
+                UserRole userrole = _context.UserRole.Find(id);
+                return userrole.Role;
+            }
+            catch
+            {
+                throw;
+            }
+        }
         public void DeleteUserRole(int id)
         {
             try
@@ -90,6 +108,21 @@ namespace CardsCustomers.Models.Services
             }
         }
 
-      
+        public string HashPassword(string plainPassword)
+        {
+            byte[] salt = new byte[16];
+            using (var rng =  RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(salt);
+            }
+           var rfcPassword= new Rfc2898DeriveBytes(plainPassword, salt, 1000, HashAlgorithmName.SHA1);
+            byte[] rfcPasswordHash = rfcPassword.GetBytes(20);
+            byte[] passwordHash = new byte[36];
+            Array.Copy(salt, 0, passwordHash, 0, 16);
+            Array.Copy(rfcPasswordHash, 0, passwordHash, 16, 20);
+            return Convert.ToBase64String(passwordHash);
+        }
+
+
     }
 }

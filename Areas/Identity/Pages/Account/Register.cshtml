@@ -10,7 +10,7 @@
     <div class="col-md-4">
         <section>
             <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-
+                <input type="hidden" asp-for="@Model.IdUserAdmin" />
 
                 <h2>Create a new account.</h2>
                 <hr />
@@ -44,13 +44,15 @@
                     <label asp-for="Input.Email">Email</label>
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
+
+
                 <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" class="form-control" type="password" autocomplete="new-password" aria-required="true" placeholder="password" />
+                    <input asp-for="Input.Password" class="form-control" value="Input.Password" autocomplete="off" type="password" aria-required="true" placeholder="password" />
                     <label asp-for="Input.Password">Password</label>
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
                 </div>
                 <div class="form-floating mb-3">
-                    <input asp-for="Input.ConfirmPassword" class="form-control" type="password" autocomplete="new-password" aria-required="true" placeholder="password" />
+                    <input asp-for="Input.ConfirmPassword" class="form-control" value="Input.ConfirmPassword" autocomplete="off" type="password" aria-required="true" placeholder="password" />
                     <label asp-for="Input.ConfirmPassword">Confirm Password</label>
                     <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
                 </div>
@@ -60,9 +62,23 @@
                     <label asp-for="Input.IdUserRole"> User Role</label>
                     <span asp-validation-for="Input.IdUserRole" class="text-danger"></span>
                 </div>
+                @if (Model.IdUserAdmin <= 0)
+                {
 
+                    <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+                }
+                else
+                {
+                    <div class="form-floating row mb-3">
+                        <div class="col-sm-6">
+                            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Update User</button>
+                        </div>
+                        <div class="col-sm-6">
+                            <a id="ChangePassword" href="/Identity/Account/ChangePassword?id=@Model.IdUserAdmin" class="w-100 btn btn-lg btn-primary">Change Password</a>
+                        </div>
+                    </div>
+                }
 
-                <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
             </form>
         </section>
     </div>

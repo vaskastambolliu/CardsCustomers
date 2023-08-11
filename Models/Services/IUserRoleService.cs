@@ -8,6 +8,9 @@ namespace CardsCustomers.Models.Services
         void CreateUserRole(UserRole userrole);
         void UpdateUserRole(int id, UserRole userrole);
         UserRole GetUserRoleById(int? id);
+        string GetUserRoleNameById(int? id);
         void DeleteUserRole(int id);
+
+        string HashPassword (string plainPassword);  
     }
 }

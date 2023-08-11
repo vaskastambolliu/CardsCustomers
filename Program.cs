@@ -30,6 +30,7 @@ namespace CardsCustomers
                 options.Password.RequireNonAlphanumeric = false;
                 options.SignIn.RequireConfirmedEmail = false;
             })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<DbCoreloginContext>();
 
             builder.Services.AddScoped<ICustomerService, CustomerService>();
