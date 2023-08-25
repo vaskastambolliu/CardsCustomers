@@ -9,7 +9,7 @@
         @onclick="@(() => BackToUserRoles())">
     Back to User Roles
 </button>
-<br/>
+<br />
 @if (Id is null)
 {
     <PageTitle>Create a new User Role </PageTitle>
@@ -29,10 +29,10 @@ else
         </label>
         <div class="col-sm-4">
             <InputText id="roleId" class="form-control"
-                       @bind-Value="UserRole.Role"  />
+                       @bind-Value="UserRole.Role" />
         </div>
     </div>
-   
+
     <br />
     <button type="submit" class="btn btn-primary">@btnText</button>
 </EditForm>
@@ -45,28 +45,46 @@ else
     string btnText = string.Empty;
     UserRole UserRole = new UserRole();
     public IEnumerable<UserRole> AllUserRole { get; set; }
-   
+
 
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Id is not null)
+        try
         {
-            var result = UserRoleService.GetUserRoleById(Id);
-            if (result is not null)
+            if (Id is not null)
             {
-                UserRole = result;
-            }
-            else
-            {
-                NavigationManager.NavigateTo("/uuserrole");
+                var result = UserRoleService.GetUserRoleById(Id);
+                if (result is not null)
+                {
+                    UserRole = result;
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/uuserrole");
+                }
             }
         }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
     }
     protected override void OnInitialized()
     {
-        btnText = Id == null ? "Save new User Role" : "Update User Role";
-       
+        try
+        {
+            btnText = Id == null ? "Save new User Role" : "Update User Role";
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
+
 
     }
 
@@ -75,18 +93,36 @@ else
 
     async Task HandleSubmit()
     {
-        if (Id is null)
+        try
         {
-            UserRoleService.CreateUserRole(UserRole);
+            if (Id is null)
+            {
+                UserRoleService.CreateUserRole(UserRole);
+            }
+            else
+            {
+                UserRoleService.UpdateUserRole((int)Id, UserRole);
+            }
         }
-        else
+        catch (Exception)
         {
-            UserRoleService.UpdateUserRole((int)Id, UserRole);
+
+            throw new InvalidOperationException("An error occured while opening the page!");
         }
+
     }
     public void BackToUserRoles()
     {
-        NavigationManager.NavigateTo("/usersroles");
+        try
+        {
+            NavigationManager.NavigateTo("/usersroles");
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
     }
 
     //public void HandleValidSubmit()

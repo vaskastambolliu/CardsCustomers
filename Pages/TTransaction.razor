@@ -8,6 +8,8 @@
 @inject IPointsPerMoneyService PointsPerMoneyService
 @inject IDiscountService DiscountService
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider _authenticationStateProvider
+
 
 @*<h3>Customer</h3>*@
 <button type="submit" class="btn btn-outline-primary"
@@ -104,7 +106,7 @@ else
 
     <div class="row mt-3">
         <label for="newvalue" class="col-sm-2 col-form-label">
-            New Value
+            New Value To Pay
         </label>
         <div class="col-sm-4">
             <InputNumber id="newvalue" class="form-control"
@@ -144,35 +146,54 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Id is not null)
+        try
         {
-            IsInViewMode = true;
-            var result = TransactionService.GetTransactionById(Id);
-            if (result is not null)
+            if (Id is not null)
             {
-                Transaction = result;
+                IsInViewMode = true;
+                var result = TransactionService.GetTransactionById(Id);
+                if (result is not null)
+                {
+                    Transaction = result;
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/ttransaction");
+                }
             }
             else
             {
-                NavigationManager.NavigateTo("/ttransaction");
+                IsInViewMode = false;
             }
         }
-        else
+        catch (Exception)
         {
-            IsInViewMode = false;
+
+            throw new InvalidOperationException("An error occured while opening the page!");
         }
+
     }
     protected async override Task OnInitializedAsync()
     {
-        btnText = Id == null ? "Save new Transaction" : "Update Transaction";
 
-        CustomerList = (await TransactionService.GetCustomers()).ToList();
-
-
-        if (Id is not null)
+        try
         {
-            DiscountList = DiscountService.GetAllDiscount().ToList();
+            btnText = Id == null ? "Save new Transaction" : "Update Transaction";
+
+            CustomerList = (await TransactionService.GetCustomers()).ToList();
+
+
+            if (Id is not null)
+            {
+                DiscountList = DiscountService.GetAllDiscount().ToList();
+            }
         }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
     }
 
     public string FormSubmitMessage { get; set; } = "Form Data Not Submitted";
@@ -180,117 +201,157 @@ else
 
     async Task HandleValidSubmit()
     {
-        if (Id is null)
+        try
         {
-            TransactionService.CreateTransaction(Transaction);
+            if (Id is null)
+            {
+                var authstate = await _authenticationStateProvider.GetAuthenticationStateAsync();
+                var user = authstate.User;
+                var name = user.Identity.Name;
+                Transaction.IdUserAdmin = CustomerService.GetCustomerByUserName(name.ToString());
+                TransactionService.CreateTransaction(Transaction);
+            }
+            else
+            {
+                TransactionService.UpdateTransaction((int)Id, Transaction);
+            }
         }
-        else
+        catch (Exception)
         {
-            TransactionService.UpdateTransaction((int)Id, Transaction);
+
+            throw new InvalidOperationException("An error occured while opening the page!");
         }
+       
     }
     public void BackToTransactions()
     {
-        NavigationManager.NavigateTo("/transactions");
+        try
+        {
+            NavigationManager.NavigateTo("/transactions");
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+       
     }
 
     private void CustomerFromDdw(ChangeEventArgs args)
     {
-        if (args.Value is not null)
+        try
         {
-            if (Convert.ToString(args.Value) != "-1")
+            if (args.Value is not null)
             {
-                int idCustomer = Convert.ToInt32(args.Value);
-                Customer customer = CustomerService.GetCustomerById(Convert.ToInt32(args.Value));
-                Transaction.IdCard = customer.TimeStampIdCard;
-                Transaction.Points = customer.Points;
-            }
-            else
-            {
-                Transaction.IdCard = null;
-                Transaction.Points = null;
-            }
+                if (Convert.ToString(args.Value) != "-1")
+                {
+                    int idCustomer = Convert.ToInt32(args.Value);
+                    Customer customer = CustomerService.GetCustomerById(Convert.ToInt32(args.Value));
+                    Transaction.IdCard = customer.TimeStampIdCard;
+                    Transaction.Points = customer.Points.Value;
+                }
+                else
+                {
+                    Transaction.IdCard = null;
+                    Transaction.Points = 0;
+                }
 
+            }
         }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+      
 
     }
 
     private void CalculateDiscount(ChangeEventArgs args)
     {
-        if (!string.IsNullOrEmpty(args.Value.ToString()))
+        try
         {
-            if (Convert.ToString(args.Value) != "-1")
+            if (!string.IsNullOrEmpty(args.Value.ToString()))
             {
-                int Purchase = Convert.ToInt32(args.Value);
-                decimal? PointsEarnedFromLastPurchase = 0;
-                decimal lastpointssaved = 0;
-                var pointspermoney = PointsPerMoneyService.GetAllPointsPerMoney();
-                if (pointspermoney is null)
+                if (Convert.ToString(args.Value) != "-1")
                 {
+                    int Purchase = Convert.ToInt32(args.Value);
+                    decimal? PointsEarnedFromLastPurchase = 0;
+                    decimal lastpointssaved = 0;
+                    var pointspermoney = PointsPerMoneyService.GetAllPointsPerMoney();
+                    if (pointspermoney is null)
+                    {
+                        throw new InvalidOperationException("An error occured!");
+                    }
+                    else
+                    {
+                        lastpointssaved = PointsPerMoneyService.GetLastPointPerMoneySaved();
+                        if (lastpointssaved != null)
+                        {
+                            PointsEarnedFromLastPurchase = lastpointssaved * Purchase;
+                            Transaction.PointsFromCurTrans = Convert.ToInt32(PointsEarnedFromLastPurchase);
+                            Transaction.Balance = Transaction.PointsFromCurTrans.Value + Transaction.Points;
+                            Transaction.Points = Transaction.PointsFromCurTrans.Value + Transaction.Points;
+                        }
+                        DiscountList = DiscountService.GetAllDiscount().ToList().Where(x => x.PointsNeeded <= Purchase);
+
+                    }
+
+
 
                 }
                 else
                 {
-                    lastpointssaved = PointsPerMoneyService.GetLastPointPerMoneySaved();
-                    if (lastpointssaved != null)
-                    {
-                        PointsEarnedFromLastPurchase = lastpointssaved * Purchase;
-                        Transaction.PointsFromCurTrans = Convert.ToInt32(PointsEarnedFromLastPurchase);
-                        Transaction.Balance = Transaction.PointsFromCurTrans + Transaction.Points;
-                    }
-                    DiscountList = DiscountService.GetAllDiscount().ToList().Where(x => x.PointsNeeded <= Purchase);
-
+                    Transaction.IdCard = null;
+                    Transaction.Points = 0;
                 }
 
-
-
             }
-            else
-            {
-                Transaction.IdCard = null;
-                Transaction.Points = null;
-            }
-
         }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+    
     }
 
 
     public void DiscountFromDdw(ChangeEventArgs args)
     {
-        if (args.Value.ToString()!= "-1")
+
+        try
         {
-            Transaction.PointsFromCurTrans = 0;
+            if (args.Value.ToString() != "-1")
+            {
+                Transaction.PointsFromCurTrans = 0;
+            }
+            var Iddiscount = Convert.ToString(args.Value);
+            Discount discount = DiscountService.GetDiscountById(Convert.ToInt32(Iddiscount));
+            Customer customer = CustomerService.GetCustomerById(Transaction.IdCustomer);
+            Transaction.Points = customer.Points.Value;
+            decimal discountPercent = Convert.ToDecimal(discount.DiscountPercent) / 100;
+
+            var cmimiaktual = Transaction.Purchase;
+            var skontoezgjedhur = discountPercent; //%
+                                                   //var NewValueprice = (cmimiaktual * (1 - discountPercent));
+            var valueToDiscount = cmimiaktual * discountPercent;
+
+            Transaction.NewValue = Transaction.Purchase - Convert.ToDecimal(valueToDiscount);
+            int pointdiscountedOfCurTrans = Transaction.PointsFromCurTrans.Value - discount.PointsNeeded;
+            Transaction.Balance = Transaction.Points + pointdiscountedOfCurTrans;
+
+            //must update the customer points
+            customer.Points = Transaction.Balance;
+            CustomerService.UpdateCustomerWithoutRedirect(customer.IdCustomer, customer);
+
         }
-        var Iddiscount = Convert.ToString(args.Value);
-        Discount discount = DiscountService.GetDiscountById(Convert.ToInt32(Iddiscount));
-        Customer customer = CustomerService.GetCustomerById(Transaction.IdCustomer);
-        Transaction.Points = customer.Points;
-        decimal discountPercent = Convert.ToDecimal(discount.DiscountPercent) / 100;
+        catch (Exception)
+        {
 
-        var cmimiaktual = Transaction.Purchase;
-        var skontoezgjedhur = discountPercent; //%
-                                               //var NewValueprice = (cmimiaktual * (1 - discountPercent));
-        var valueToDiscount = cmimiaktual * discountPercent;
-
-        Transaction.NewValue = Transaction.Purchase - Convert.ToDecimal(valueToDiscount);
-        var pointdiscountedOfCurTrans = Transaction.PointsFromCurTrans - discount.PointsNeeded;
-        Transaction.Balance = Transaction.Points + pointdiscountedOfCurTrans;
-
-        //must update the customer points
-        customer.Points = Transaction.Balance;
-        CustomerService.UpdateCustomerWithoutRedirect(customer.IdCustomer, customer);
-
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+        
     }
 
-
-    
-    //public void HandleValidSubmit()
-    //{
-    //    btnText = Id == null ? "Save new Customer" : "Update Customer";
-    //    Context.Add(CustomerService);
-    //    Context.SaveChanges();
-    //    FormSubmitMessage = "Form Data Submitted";
-    //}
-
-    //public void HandleInvalidSubmit() => FormSubmitMessage = "Invalid Data Submitted";
 }

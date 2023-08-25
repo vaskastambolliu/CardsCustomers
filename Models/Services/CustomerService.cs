@@ -92,6 +92,21 @@ namespace CardsCustomers.Models.Services
                 throw;
             }
         }
+
+
+        public int GetCustomerByUserName(string? name)
+        {
+            try
+            {
+                Customer customer = _context.Customers.Find(name);
+                return customer.IdCustomer;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public void DeleteCustomer(int id)
         {
             try

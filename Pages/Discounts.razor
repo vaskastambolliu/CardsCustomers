@@ -76,25 +76,25 @@ else
     </div>
 
 
- @*   <div class="row mt-3">
-        <label for="client" class="col-sm-2 col-form-label">Currency</label>
-        <div class="col-sm-2">
-            <InputSelect id="currency" @bind-Value="@IdCurrency"  class="form-select">
+    @*   <div class="row mt-3">
+    <label for="client" class="col-sm-2 col-form-label">Currency</label>
+    <div class="col-sm-2">
+    <InputSelect id="currency" @bind-Value="@IdCurrency"  class="form-select">
 
-                <option value="-1"> -- Select -- </option>
+    <option value="-1"> -- Select -- </option>
 
-                @foreach (var curr in AllCurrency)
-                {
-                    <option value="@curr.IdCurrency">@curr.CurrencyName</option>
-                }
+    @foreach (var curr in AllCurrency)
+    {
+    <option value="@curr.IdCurrency">@curr.CurrencyName</option>
+    }
 
-            </InputSelect>
-        </div>
+    </InputSelect>
+    </div>
 
-        <div class="col-sm-2">
-            <a class="btn btn-sm  btn-primary" href="/ccurrency">Create Currency</a>
-          @*  <button type="submit" @onclick="@(() => CreateNewCurrency())" class="btn btn-success">Create Currency</button>*@
-@*        </div>
+    <div class="col-sm-2">
+    <a class="btn btn-sm  btn-primary" href="/ccurrency">Create Currency</a>
+    @*  <button type="submit" @onclick="@(() => CreateNewCurrency())" class="btn btn-success">Create Currency</button>*@
+    @*        </div>
     </div>*@
 
 </EditForm>
@@ -108,32 +108,70 @@ else
 
     protected override void OnInitialized()
     {
-        AllDiscounts = DiscountService.GetAllDiscount();
-        AllPointsPerMoney = PointsPerMoneyService.GetAllPointsPerMoney();
-        if (AllPointsPerMoney is not null && AllPointsPerMoney.ToList().Count > 0)
+
+        try
         {
-            PointsPerMoney.PointsPerMoneyValue = PointsPerMoneyService.GetLastPointPerMoneySaved();
+            AllDiscounts = DiscountService.GetAllDiscount();
+            AllPointsPerMoney = PointsPerMoneyService.GetAllPointsPerMoney();
+            if (AllPointsPerMoney is not null && AllPointsPerMoney.ToList().Count > 0)
+            {
+                PointsPerMoney.PointsPerMoneyValue = PointsPerMoneyService.GetLastPointPerMoneySaved();
+            }
+            AllCurrency = CurrencyService.GetAllCurrency();
+            if (AllCurrency is not null && AllCurrency.ToList().Count > 0)
+            {
+                IdCurrency = CurrencyService.GetLastCurrencySaved();
+            }
         }
-        AllCurrency = CurrencyService.GetAllCurrency();
-        if (AllCurrency is not null && AllCurrency.ToList().Count>0)
+        catch (Exception)
         {
-            IdCurrency = CurrencyService.GetLastCurrencySaved();
+
+            throw new InvalidOperationException("An error occured while opening the page!");
         }
+
     }
 
     public void DeleteDiscount(int id)
     {
-        DiscountService.DeleteDiscount(id);
+        try
+        {
+            DiscountService.DeleteDiscount(id);
+        }
+        catch (Exception)
+        {
+            throw new InvalidOperationException("An error occured while opening the page!");
+
+        }
+
+
     }
 
     void CreateNewDiscount()
     {
-        NavigationManager.NavigateTo("/ddiscount");
+        try
+        {
+            NavigationManager.NavigateTo("/ddiscount");
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
     }
 
     public void SavePointsperMoney(PointsPerMoney PointsPerMoney)
     {
-        PointsPerMoneyService.CreatePointsPerMoney(PointsPerMoney);
+        try
+        {
+            PointsPerMoneyService.CreatePointsPerMoney(PointsPerMoney);
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
     }
 
 

@@ -10,7 +10,7 @@
 <h1>Transactions</h1>
 
 <p>This is the list of registrated Transactions.</p>
-<br/>
+<br />
 <button class="btn btn-sm  btn-primary" @onclick="@(() => CreateNewTransaction())">Create Transaction</button>
 <br />
 @if (AllTransactions == null)
@@ -51,7 +51,7 @@ else
                             Delete
                         </button>
                     </td>
-                   
+
                 </tr>
             }
         </tbody>
@@ -62,16 +62,45 @@ else
     public IEnumerable<dynamic> AllTransactions { get; set; }
     protected override void OnInitialized()
     {
-        AllTransactions = TransactionService.GetAllTransactions().ToList();
+        try
+        {
+            AllTransactions = TransactionService.GetAllTransactions().ToList();
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
+
     }
 
     public void DeleteTransaction(int id)
     {
-        TransactionService.DeleteTransaction(id);
+        try
+        {
+            TransactionService.DeleteTransaction(id);
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
+
     }
 
     void CreateNewTransaction()
     {
-        NavigationManager.NavigateTo("/ttransaction");
+        try
+        {
+            NavigationManager.NavigateTo("/ttransaction");
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
     }
 }

@@ -9,10 +9,10 @@
         @onclick="@(() => BackToDiscounts())">
     Back to Discounts
 </button>
-<br/>
+<br />
 @if (Id is null)
 {
-    <PageTitle >Create a new Discount </PageTitle>
+    <PageTitle>Create a new Discount </PageTitle>
     <h3 class="text-center">Create a New Discount</h3>
 }
 else
@@ -29,7 +29,7 @@ else
         </label>
         <div class="col-sm-4">
             <InputText id="DiscountName" class="form-control"
-                       @bind-Value="Discount.DiscountName"  />
+                       @bind-Value="Discount.DiscountName" />
         </div>
     </div>
     <div class="row mt-3">
@@ -38,7 +38,7 @@ else
         </label>
         <div class="col-sm-4">
             <InputNumber id="PointsNeeded" class="form-control"
-                         @bind-Value="Discount.PointsNeeded"  />
+                         @bind-Value="Discount.PointsNeeded" />
         </div>
     </div>
     <div class="row mt-3">
@@ -47,7 +47,7 @@ else
         </label>
         <div class="col-sm-4">
             <InputNumber id="DiscountPercent" class="form-control"
-                         @bind-Value="Discount.DiscountPercent"  />
+                         @bind-Value="Discount.DiscountPercent" />
         </div>
     </div>
     <br />
@@ -64,28 +64,46 @@ else
     DbCoreloginContext Context { get; set; }
     Discount Discount = new Discount();
     public IEnumerable<Discount> AllDiscounts { get; set; }
-   
+
 
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Id is not null)
+        try
         {
-            var result = DiscountService.GetDiscountById(Id);
-            if (result is not null)
+            if (Id is not null)
             {
-                Discount = result;
-            }
-            else
-            {
-                NavigationManager.NavigateTo("/ddiscount");
+                var result = DiscountService.GetDiscountById(Id);
+                if (result is not null)
+                {
+                    Discount = result;
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/ddiscount");
+                }
             }
         }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
     }
     protected override void OnInitialized()
     {
-        btnText = Id == null ? "Save new Discount" : "Update Discount";
-       
+        try
+        {
+            btnText = Id == null ? "Save new Discount" : "Update Discount";
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
+
 
     }
 
@@ -94,18 +112,36 @@ else
 
     async Task HandleSubmit()
     {
-        if (Id is null)
+        try
         {
-            DiscountService.CreateDiscount(Discount);
+            if (Id is null)
+            {
+                DiscountService.CreateDiscount(Discount);
+            }
+            else
+            {
+                DiscountService.UpdateDiscount((int)Id, Discount);
+            }
         }
-        else
+        catch (Exception)
         {
-            DiscountService.UpdateDiscount((int)Id, Discount);
+
+            throw new InvalidOperationException("An error occured while opening the page!");
         }
+
     }
     public void BackToDiscounts()
     {
-        NavigationManager.NavigateTo("/discounts");
+        try
+        {
+            NavigationManager.NavigateTo("/discounts");
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+    
     }
 
     //public void HandleValidSubmit()

@@ -26,4 +26,5 @@ public partial class Customer
     public bool? Deleted { get; set; }
 
     public string TimeStampIdCard { get; set; } = null!;
+    public string? Gender { get; set; }
 }

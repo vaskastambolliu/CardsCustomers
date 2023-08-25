@@ -75,17 +75,44 @@
     public IEnumerable<Customer> AllCustomers { get; set; }
     protected override void OnInitialized()
     {
-        AllCustomers = CustomerService.GetAllCustomers();
+        try
+        {
+            AllCustomers = CustomerService.GetAllCustomers();
+        }
+        catch (Exception)
+        {
+            throw new InvalidOperationException("An error occured while opening the page!");
+          
+        }
+       
     }
 
     public void DeleteCustomer(Customer c)
     {
-        Context.Remove(c);
-        Context.SaveChanges();
+        try
+        {
+            Context.Remove(c);
+            Context.SaveChanges();
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while deleting the customer!");
+        }
+      
     }
 
     void CreateNewCustomer()
     {
-        NavigationManager.NavigateTo("/ccustomer");
+        try
+        {
+            NavigationManager.NavigateTo("/ccustomer");
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the creation page of customers!");
+        }
+        
     }
 }

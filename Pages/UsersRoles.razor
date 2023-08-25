@@ -10,7 +10,7 @@
 <h1>User Role</h1>
 
 <p>This is the list of registrated User Role.</p>
-<br/>
+<br />
 <button class="btn btn-sm  btn-primary" @onclick="@(() => CreateNewUserRole())">Create User Role</button>
 <br />
 @if (AllUserRoles == null)
@@ -33,14 +33,14 @@ else
                 <tr>
                     <td><a class="btn btn-sm btn-warning" href="/uuserrole/@userrole.IdUserRole">Edit</a></td>
                     <td>@userrole.Role</td>
- 
+
                     <td>
                         <button class="btn btn-sm btn-danger"
                         @onclick="@(() => DeleteUserRole(userrole.IdUserRole))">
                             Delete
                         </button>
                     </td>
-                   
+
                 </tr>
             }
         </tbody>
@@ -51,16 +51,43 @@ else
     public IEnumerable<UserRole> AllUserRoles { get; set; }
     protected override void OnInitialized()
     {
-        AllUserRoles = UserRoleService.GetAllUserRole();
+        try
+        {
+            AllUserRoles = UserRoleService.GetAllUserRole();
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
     }
 
     public void DeleteUserRole(int id)
     {
-        UserRoleService.DeleteUserRole(id);
+        try
+        {
+            UserRoleService.DeleteUserRole(id);
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
     }
 
     void CreateNewUserRole()
     {
-        NavigationManager.NavigateTo("/uuserrole");
+        try
+        {
+            NavigationManager.NavigateTo("/uuserrole");
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+        
     }
 }

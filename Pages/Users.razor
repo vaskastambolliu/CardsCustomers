@@ -58,20 +58,56 @@ else
     public IEnumerable<UserAdmin> AllUsers { get; set; }
     protected override void OnInitialized()
     {
-        AllUsers = UserAdminService.GetAllUserAdmin();
+        try
+        {
+            AllUsers = UserAdminService.GetAllUserAdmin();
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
     }
 
     public void DeleteUser(int id)
     {
-        UserAdminService.DeleteUserAdmin(id);
+        try
+        {
+            UserAdminService.DeleteUserAdmin(id);
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
     }
     public void ViewUser(int id)
     {
-        NavigationManager.NavigateTo("/Identity/Account/Register?id="+id, true);
+        try
+        {
+            NavigationManager.NavigateTo("/Identity/Account/Register?id=" + id, true);
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+ 
     }
 
     void CreateNewUser()
     {
-        NavigationManager.NavigateTo("/Identity/Account/Register", true);
+        try
+        {
+            NavigationManager.NavigateTo("/Identity/Account/Register", true);
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+       
     }
 }

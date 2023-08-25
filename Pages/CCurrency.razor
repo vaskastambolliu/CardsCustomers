@@ -9,10 +9,10 @@
         @onclick="@(() => BackToDiscounts())">
     Back to Discounts
 </button>
-<br/>
+<br />
 @if (Id is null)
 {
-    <PageTitle >Create a new Currency </PageTitle>
+    <PageTitle>Create a new Currency </PageTitle>
     <h3 class="text-center">Create a New Currency</h3>
 }
 else
@@ -29,10 +29,10 @@ else
         </label>
         <div class="col-sm-4">
             <InputText id="CurrencyName" class="form-control"
-                       @bind-Value="Currency.CurrencyName"  />
+                       @bind-Value="Currency.CurrencyName" />
         </div>
     </div>
-   
+
     <br />
     <button type="submit" class="btn btn-primary">@btnText</button>
 </EditForm>
@@ -45,28 +45,46 @@ else
     string btnText = string.Empty;
     Currency Currency = new Currency();
     public IEnumerable<Currency> AllCurrency { get; set; }
-   
+
 
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Id is not null)
+        try
         {
-            var result = CurrencyService.GetCurrencyById(Id);
-            if (result is not null)
+            if (Id is not null)
             {
-                Currency = result;
-            }
-            else
-            {
-                NavigationManager.NavigateTo("/ddiscount");
+                var result = CurrencyService.GetCurrencyById(Id);
+                if (result is not null)
+                {
+                    Currency = result;
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/ddiscount");
+                }
             }
         }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
     }
     protected override void OnInitialized()
     {
-        btnText = Id == null ? "Save new Currency" : "Update Currency";
-       
+        try
+        {
+            btnText = Id == null ? "Save new Currency" : "Update Currency";
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
+
 
     }
 
@@ -75,18 +93,36 @@ else
 
     async Task HandleSubmit()
     {
-        if (Id is null)
+        try
         {
-            CurrencyService.CreateCurrency(Currency);
+            if (Id is null)
+            {
+                CurrencyService.CreateCurrency(Currency);
+            }
+            else
+            {
+                CurrencyService.UpdateCurrency((int)Id, Currency);
+            }
         }
-        else
+        catch (Exception)
         {
-            CurrencyService.UpdateCurrency((int)Id, Currency);
+
+            throw new InvalidOperationException("An error occured while opening the page!");
         }
+
     }
     public void BackToDiscounts()
     {
-        NavigationManager.NavigateTo("/discounts");
+        try
+        {
+            NavigationManager.NavigateTo("/discounts");
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+       
     }
 
     //public void HandleValidSubmit()

@@ -47,6 +47,7 @@ namespace CardsCustomers.Models.Services
             try
             {
                 transaction.InsertDate = DateTime.Now;
+                transaction.Deleted = false;   
                 _context.Transactions.Add(transaction);
                 _context.SaveChanges();
                 _navigationManager.NavigateTo("transactions");

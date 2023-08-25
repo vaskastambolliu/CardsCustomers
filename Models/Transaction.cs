@@ -23,7 +23,7 @@ public partial class Transaction
 
     public DateTime InsertDate { get; set; }
 
-    public int IdUserAdmin { get; set; }
+    public int? IdUserAdmin { get; set; }
 
     public bool? Deleted { get; set; }
     public int? PointsFromCurTrans { get; set; }

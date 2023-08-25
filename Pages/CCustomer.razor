@@ -10,10 +10,10 @@
         @onclick="@(() => BackToCustomers())">
     Back to Customers
 </button>
-<br/>
+<br />
 @if (Id is null)
 {
-    <PageTitle >Create a new Customer </PageTitle>
+    <PageTitle>Create a new Customer </PageTitle>
     <h3 class="text-center">Create a New Customer</h3>
 }
 else
@@ -31,8 +31,8 @@ else
             Name
         </label>
         <div class="col-sm-4">
-            <InputText id="newvalue" class="form-control"
-                         @bind-Value="Customer.Name" />
+            <InputText id="newvalue" required class="form-control"
+                       @bind-Value="Customer.Name" />
         </div>
     </div>
 
@@ -45,7 +45,7 @@ else
             Surname
         </label>
         <div class="col-sm-4">
-            <InputText id="Surname" class="form-control"
+            <InputText id="Surname" required class="form-control"
                        @bind-Value="Customer.Surname" />
         </div>
     </div>
@@ -53,12 +53,37 @@ else
 
 
 
+
+
+    @foreach (var model in models)
+    {
+        <div class="row mt-3">
+            <label for="Gender" class="col-sm-2 col-form-label">
+                Gender
+            </label>
+            <div class="col-sm-4">
+                <InputRadioGroup @bind-Value="Customer.Gender">
+                    @foreach (var option in model.Options)
+                    {
+                        <div>
+                            <InputRadio required Value="option.Value" /> @option.Value
+                        </div>
+                    }
+                </InputRadioGroup>
+               @* <div>
+                    Selected: @model.Selected
+                </div>*@
+            </div>
+        </div>
+    }
+
+
     <div class="row mt-3">
         <label for="DateOfBirth" class="col-sm-2 col-form-label">
             Birth Date
         </label>
         <div class="col-sm-4">
-            <InputDate id="DateOfBirth" class="form-control"
+            <InputDate id="DateOfBirth" required class="form-control"
                        @bind-Value="Customer.DateOfBirth" />
         </div>
     </div>
@@ -73,7 +98,7 @@ else
             Email
         </label>
         <div class="col-sm-4">
-            <InputText id="Email" class="form-control"
+            <InputText id="Email" required class="form-control"
                        @bind-Value="Customer.Email" />
         </div>
     </div>
@@ -87,7 +112,7 @@ else
             Phone
         </label>
         <div class="col-sm-4">
-            <InputText id="Phone" class="form-control"
+            <InputText id="Phone" required class="form-control"
                        @bind-Value="Customer.Phone" />
         </div>
     </div>
@@ -101,7 +126,7 @@ else
             Card Nr.
         </label>
         <div class="col-sm-4">
-            <InputText id="TimeStampIdCard" class="form-control"
+            <InputText disabled="true"  id="TimeStampIdCard" class="form-control"
                        @bind-Value="Customer.TimeStampIdCard" />
         </div>
     </div>
@@ -115,7 +140,7 @@ else
             Points
         </label>
         <div class="col-sm-4">
-            <InputNumber id="Points" class="form-control"
+            <InputNumber disabled="true" id="Points" class="form-control"
                          @bind-Value="Customer.Points" />
         </div>
     </div>
@@ -133,27 +158,46 @@ else
     DbCoreloginContext Context { get; set; }
     Customer Customer = new Customer();
     public IEnumerable<Customer> AllCustomers { get; set; }
-
+    private List<ModelGender> models;
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Id is not null)
+        try
         {
-            var result = CustomerService.GetCustomerById(Id);
-            if (result is not null)
+            if (Id is not null)
             {
-                Customer = result;
-            }
-            else
-            {
-                NavigationManager.NavigateTo("/ccustomer");
+                var result = CustomerService.GetCustomerById(Id);
+                if (result is not null)
+                {
+                    Customer = result;
+                }
+                else
+                {
+                    NavigationManager.NavigateTo("/ccustomer");
+                }
             }
         }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
     }
     protected override void OnInitialized()
     {
-        btnText = Id == null ? "Save new Customer" : "Update Customer";
-        Customer.TimeStampIdCard = CustomerService.GetTimestamp(DateTime.Now);
+        try
+        {
+            btnText = Id == null ? "Save new Customer" : "Update Customer";
+            Customer.TimeStampIdCard = CustomerService.GetTimestamp(DateTime.Now);
+            models = Models;
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
     }
 
     public string FormSubmitMessage { get; set; } = "Form Data Not Submitted";
@@ -161,20 +205,69 @@ else
 
     async Task HandleSubmit()
     {
-        if (Id is null)
+        try
         {
-            CustomerService.CreateCustomer(Customer);
+            if (Id is null)
+            {
+                CustomerService.CreateCustomer(Customer);
+            }
+            else
+            {
+                CustomerService.UpdateCustomer((int)Id, Customer);
+            }
         }
-        else
+        catch (Exception)
         {
-            CustomerService.UpdateCustomer((int)Id, Customer);
+
+            throw new InvalidOperationException("An error occured while opening the page!");
         }
+
     }
     public void BackToCustomers()
     {
-        NavigationManager.NavigateTo("/customers");
+        try
+        {
+            NavigationManager.NavigateTo("/customers");
+        }
+        catch (Exception)
+        {
+
+            throw new InvalidOperationException("An error occured while opening the page!");
+        }
+
     }
 
+    public List<ModelGender> Models => new List<ModelGender>()
+    {
+        new ModelGender() { Value = "Fred"}
+        //new ModelGender() { Value = "Jon"},
+     };
+    public class ModelOptionsGender
+    {
+        public string Value { get; set; }
+        public bool Selected
+        {
+            get => _Selected;
+            set
+            {
+                _Selected = value;
+            }
+        }
+        public bool _Selected;
+    }
+
+    public class ModelGender
+    {
+        public string Value { get; set; }
+        public string Selected { get; set; }
+        public List<ModelOptionsGender> Options { get; set; } = new List<ModelOptionsGender>()
+        {
+            new ModelOptionsGender() {Value="Male", Selected=true},
+            new ModelOptionsGender() {Value="Female", Selected=false},
+            new ModelOptionsGender() {Value="Other", Selected=false},
+
+        };
+    }
     //public void HandleValidSubmit()
     //{
     //    btnText = Id == null ? "Save new Customer" : "Update Customer";
