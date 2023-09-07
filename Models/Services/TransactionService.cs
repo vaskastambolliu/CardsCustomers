@@ -31,7 +31,7 @@ namespace CardsCustomers.Models.Services
                           {
                               transaction = item,
                               customer = item2
-                          }).ToList();
+                          }).OrderBy(x=>x.transaction.IdTransaction).ToList();
 
 
                 return result;

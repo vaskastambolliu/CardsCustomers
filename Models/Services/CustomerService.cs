@@ -98,8 +98,8 @@ namespace CardsCustomers.Models.Services
         {
             try
             {
-                Customer customer = _context.Customers.Find(name);
-                return customer.IdCustomer;
+                UserAdmin customer = _context.UserAdmins.FirstOrDefault(x=>x.Email==name);
+                return Convert.ToInt32(customer.IdUserAdmin);
             }
             catch
             {

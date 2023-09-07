@@ -19,7 +19,7 @@
 <br />
 @if (Id is null)
 {
-    <PageTitle>Create a new Transaction </PageTitle>   
+    <PageTitle>Create a new Transaction </PageTitle>
     <h3 class="text-center">Create a New Transaction</h3>
 }
 else
@@ -37,9 +37,9 @@ else
         <div class="col-sm-4">
             <InputSelect id="client" @bind-Value="Transaction.IdCustomer" disabled=@IsInViewMode @oninput="CustomerFromDdw"
                          class="form-select">
-                
+
                 <option value="-1"> -- Select -- </option>
-            
+
                 @foreach (var cust in CustomerList)
                 {
                     var customerInfo = @cust.Name + " " + @cust.Surname;
@@ -64,17 +64,17 @@ else
             Points
         </label>
         <div class="col-sm-4">
-            <InputNumber id="points" class="form-control" readonly="@IsInViewMode"
-                         @bind-Value="Transaction.Points"  />
+            <InputNumber id="points" class="form-control" readonly="@true"
+                         @bind-Value="Transaction.Points" />
         </div>
     </div>
     <div class="row mt-3">
         <label for="purchase" class="col-sm-2 col-form-label">
             Purchase
         </label>
-        <div class="col-sm-4"> 
+        <div class="col-sm-4">
             <InputNumber id="purchase" class="form-control" readonly="@IsInViewMode"
-                         @bind-Value="Transaction.Purchase" @oninput="CalculateDiscount"
+                         @bind-Value="Transaction.Purchase" @oninput="CalculatePoints"
                          required="@true" />
         </div>
     </div>
@@ -88,7 +88,7 @@ else
                 <option value="-1"> -- Select -- </option>
                 @foreach (var disc in DiscountList)
                 {
-                    var element = @disc.DiscountName + " - " +@disc.PointsNeeded + " Points Nedded";
+                    var element = @disc.DiscountName + " - " + @disc.PointsNeeded + " Points Nedded";
                     <option value="@disc.IdDiscount">@element</option>
                 }
 
@@ -99,7 +99,7 @@ else
             Points of This Purchase
         </label>
         <div class="col-sm-2">
-            <InputNumber id="points" class="form-control" 
+            <InputNumber id="points" class="form-control"
                          @bind-Value="Transaction.PointsFromCurTrans" readonly="@true" />
         </div>
     </div>
@@ -116,7 +116,7 @@ else
 
     <div class="row mt-3">
         <label for="balance" class="col-sm-2 col-form-label">
-            Balance
+            Points Balance
         </label>
         <div class="col-sm-4">
             <InputNumber id="balance" class="form-control"
@@ -136,13 +136,15 @@ else
     string btnText = string.Empty;
     [Inject]
     DbCoreloginContext Context { get; set; }
-    Transaction Transaction = new Transaction();
+    Transaction Transaction { get; set; } = new Transaction();
     public IEnumerable<Transaction> AllTransactions { get; set; }
     public List<Customer> CustomerList { get; set; } = new List<Customer>();
     public IEnumerable<Discount> DiscountList { get; set; } = new List<Discount>();
     public bool IsInViewMode { get; set; }
+    public Customer customer { get; set; }
 
-    private string IdCustomerValueDdw { get; set; }
+    private int IdCustomerValueDdw { get; set; }
+    public int CustomerPointsUpdated { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -209,7 +211,12 @@ else
                 var user = authstate.User;
                 var name = user.Identity.Name;
                 Transaction.IdUserAdmin = CustomerService.GetCustomerByUserName(name.ToString());
+                Transaction.Points = Transaction.PointsFromCurTrans.Value + customer.Points;
                 TransactionService.CreateTransaction(Transaction);
+
+                //must update customers points
+                customer.Points = CustomerPointsUpdated;
+                CustomerService.UpdateCustomerWithoutRedirect(customer.IdCustomer, customer);
             }
             else
             {
@@ -221,7 +228,7 @@ else
 
             throw new InvalidOperationException("An error occured while opening the page!");
         }
-       
+
     }
     public void BackToTransactions()
     {
@@ -234,7 +241,7 @@ else
 
             throw new InvalidOperationException("An error occured while opening the page!");
         }
-       
+
     }
 
     private void CustomerFromDdw(ChangeEventArgs args)
@@ -245,8 +252,8 @@ else
             {
                 if (Convert.ToString(args.Value) != "-1")
                 {
-                    int idCustomer = Convert.ToInt32(args.Value);
-                    Customer customer = CustomerService.GetCustomerById(Convert.ToInt32(args.Value));
+                    IdCustomerValueDdw = Convert.ToInt32(args.Value);
+                    customer = CustomerService.GetCustomerById(Convert.ToInt32(args.Value));
                     Transaction.IdCard = customer.TimeStampIdCard;
                     Transaction.Points = customer.Points.Value;
                 }
@@ -263,11 +270,11 @@ else
 
             throw new InvalidOperationException("An error occured while opening the page!");
         }
-      
+
 
     }
 
-    private void CalculateDiscount(ChangeEventArgs args)
+    private void CalculatePoints(ChangeEventArgs args)
     {
         try
         {
@@ -279,6 +286,10 @@ else
                     decimal? PointsEarnedFromLastPurchase = 0;
                     decimal lastpointssaved = 0;
                     var pointspermoney = PointsPerMoneyService.GetAllPointsPerMoney();
+                    Transaction.Balance = 0;
+                    Transaction.Discount = -1;
+                    Transaction.Points = customer.Points;
+                    Transaction.NewValue = 0;
                     if (pointspermoney is null)
                     {
                         throw new InvalidOperationException("An error occured!");
@@ -290,10 +301,11 @@ else
                         {
                             PointsEarnedFromLastPurchase = lastpointssaved * Purchase;
                             Transaction.PointsFromCurTrans = Convert.ToInt32(PointsEarnedFromLastPurchase);
-                            Transaction.Balance = Transaction.PointsFromCurTrans.Value + Transaction.Points;
-                            Transaction.Points = Transaction.PointsFromCurTrans.Value + Transaction.Points;
+                            Transaction.Balance = Transaction.PointsFromCurTrans.Value + customer.Points;
+
+                            //Transaction.Points = Transaction.PointsFromCurTrans.Value + customer.Points;
                         }
-                        DiscountList = DiscountService.GetAllDiscount().ToList().Where(x => x.PointsNeeded <= Purchase);
+                        DiscountList = DiscountService.GetAllDiscount().ToList().Where(x => x.PointsNeeded <= Transaction.Balance);
 
                     }
 
@@ -313,7 +325,7 @@ else
 
             throw new InvalidOperationException("An error occured while opening the page!");
         }
-    
+
     }
 
 
@@ -324,26 +336,39 @@ else
         {
             if (args.Value.ToString() != "-1")
             {
+
                 Transaction.PointsFromCurTrans = 0;
+                var Iddiscount = Convert.ToString(args.Value);
+                Discount discount = DiscountService.GetDiscountById(Convert.ToInt32(Iddiscount));
+                //Transaction.Points = customer.Points.Value;
+                decimal discountPercent = Convert.ToDecimal(discount.DiscountPercent) / 100;
+                Transaction.Discount = Convert.ToInt32(Iddiscount);
+                //llogaritja e vleres qe duhet zbritur cmimit
+                var cmimiaktual = Transaction.Purchase;
+                var skontoezgjedhur = discountPercent;
+                var valueToDiscount = cmimiaktual * discountPercent;
+                Transaction.NewValue = Transaction.Purchase - Convert.ToDecimal(valueToDiscount);
+
+                int pointdiscountedOfCurTrans = Transaction.PointsFromCurTrans.Value - discount.PointsNeeded;
+                if (pointdiscountedOfCurTrans <= 0)
+                {
+                    Transaction.Balance = 0;
+                }
+                else
+                {
+                    Transaction.Balance = customer.Points + pointdiscountedOfCurTrans;
+                }
+
+                //must update the customer points
+                CustomerPointsUpdated = Transaction.Balance.Value;
             }
-            var Iddiscount = Convert.ToString(args.Value);
-            Discount discount = DiscountService.GetDiscountById(Convert.ToInt32(Iddiscount));
-            Customer customer = CustomerService.GetCustomerById(Transaction.IdCustomer);
-            Transaction.Points = customer.Points.Value;
-            decimal discountPercent = Convert.ToDecimal(discount.DiscountPercent) / 100;
+            else
+            {
+                Transaction.NewValue = 0;
+                Transaction.Balance = 0;
+            }
 
-            var cmimiaktual = Transaction.Purchase;
-            var skontoezgjedhur = discountPercent; //%
-                                                   //var NewValueprice = (cmimiaktual * (1 - discountPercent));
-            var valueToDiscount = cmimiaktual * discountPercent;
 
-            Transaction.NewValue = Transaction.Purchase - Convert.ToDecimal(valueToDiscount);
-            int pointdiscountedOfCurTrans = Transaction.PointsFromCurTrans.Value - discount.PointsNeeded;
-            Transaction.Balance = Transaction.Points + pointdiscountedOfCurTrans;
-
-            //must update the customer points
-            customer.Points = Transaction.Balance;
-            CustomerService.UpdateCustomerWithoutRedirect(customer.IdCustomer, customer);
 
         }
         catch (Exception)
@@ -351,7 +376,7 @@ else
 
             throw new InvalidOperationException("An error occured while opening the page!");
         }
-        
+
     }
 
 }
