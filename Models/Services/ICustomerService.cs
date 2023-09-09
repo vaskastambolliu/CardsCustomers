@@ -10,5 +10,6 @@
         void DeleteCustomer(int id);
         string GetTimestamp(DateTime value);
         public int GetCustomerByUserName(string? name);
+        public int CountCustomers();
     }
 }

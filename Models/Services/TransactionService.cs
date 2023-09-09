@@ -118,5 +118,51 @@ namespace CardsCustomers.Models.Services
             public Transaction transaction { get; set; }
             public Customer customer { get; set; }
         }
+
+        public int TotalPurchase()
+        {
+            int totalPurchase = 0;
+            try
+            {
+
+                totalPurchase = _context.Transactions.Where(t => t.Deleted == false).Sum(i => i.Purchase).Value;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            return totalPurchase;
+        }
+
+        public int TotalDiscountApplyed()
+        {
+            int totalDiscount = 0;
+            try
+            {
+                totalDiscount = _context.Transactions.Where(t => t.Deleted == false && t.Discount!=null).Count();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            return totalDiscount;
+        }
+
+        public int TotalPurchaseWithDiscountApplyed()
+        {
+            int totalPurchaseWithDiscountApplyed = 0;
+            try
+            {
+                totalPurchaseWithDiscountApplyed = _context.Transactions.Where(t => t.Deleted == false && t.Discount != null).Sum(i => i.Purchase).Value;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            return totalPurchaseWithDiscountApplyed;
+        }
     }
 }

@@ -16,5 +16,8 @@ namespace CardsCustomers.Models.Services
             public Transaction transaction { get; set; }
             public Customer customer { get; set; }
         }
+        public int TotalPurchase();
+        public int TotalDiscountApplyed();
+        public int TotalPurchaseWithDiscountApplyed();
     }
 }

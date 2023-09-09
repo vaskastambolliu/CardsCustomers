@@ -17,7 +17,7 @@ namespace CardsCustomers.Models.Services
         {
             try
             {
-                return _context.Customers.ToList();
+                return _context.Customers.ToList().OrderBy(x => x.IdCustomer);
             }
             catch
             {
@@ -98,7 +98,7 @@ namespace CardsCustomers.Models.Services
         {
             try
             {
-                UserAdmin customer = _context.UserAdmins.FirstOrDefault(x=>x.Email==name);
+                UserAdmin customer = _context.UserAdmins.FirstOrDefault(x => x.Email == name);
                 return Convert.ToInt32(customer.IdUserAdmin);
             }
             catch
@@ -121,10 +121,27 @@ namespace CardsCustomers.Models.Services
             }
         }
 
-        public  string GetTimestamp(DateTime value)
+        public string GetTimestamp(DateTime value)
         {
             return value.ToString("yyyyMMddHHmmssffff");
         }
 
+        public int CountCustomers()
+        {
+            int NumberOfCustomers = 0;
+            try
+            {
+                NumberOfCustomers = _context.Customers
+                                     .Where(o => o.Deleted == false)
+                                     .Count();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+            return NumberOfCustomers;
+        }
     }
 }
