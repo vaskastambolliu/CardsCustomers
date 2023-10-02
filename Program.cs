@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Syncfusion.Blazor;
+//using Syncfusion.Blazor;
 
 namespace CardsCustomers
 {
@@ -18,7 +18,7 @@ namespace CardsCustomers
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddSingleton<WeatherForecastService>();
-            builder.Services.AddSyncfusionBlazor();
+            //builder.Services.AddSyncfusionBlazor();
             builder.Services.AddDbContext<DbCoreloginContext>(option =>
                 option.UseSqlServer(builder.Configuration.GetConnectionString("CardsCustomerDb")));
             builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>

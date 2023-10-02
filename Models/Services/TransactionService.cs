@@ -135,19 +135,19 @@ namespace CardsCustomers.Models.Services
             return totalPurchase;
         }
 
-        public int TotalDiscountApplyed()
+        public int TotalPurchaseNoDiscountApplyed()
         {
-            int totalDiscount = 0;
+            int totalPurchaseWithNoDiscountApplyed = 0;
             try
             {
-                totalDiscount = _context.Transactions.Where(t => t.Deleted == false && t.Discount!=null).Count();
+                totalPurchaseWithNoDiscountApplyed = _context.Transactions.Where(t => t.Deleted == false && t.Discount==null).Sum(i => i.Purchase).Value;
             }
             catch (Exception)
             {
 
                 throw;
             }
-            return totalDiscount;
+            return totalPurchaseWithNoDiscountApplyed;
         }
 
         public int TotalPurchaseWithDiscountApplyed()
@@ -163,6 +163,43 @@ namespace CardsCustomers.Models.Services
                 throw;
             }
             return totalPurchaseWithDiscountApplyed;
+        }
+
+        public int CountDiscountsApplied()
+        {
+            int NumberOfDiscounts = 0;
+            try
+            {
+                NumberOfDiscounts = _context.Transactions
+                                     .Where(o => o.Deleted == false && o.Discount != null)
+                                     .Count();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+            return NumberOfDiscounts;
+        }
+
+
+        public int CountNoDiscountsApplied()
+        {
+            int NumberOfNoDiscounts = 0;
+            try
+            {
+                NumberOfNoDiscounts = _context.Transactions
+                                     .Where(o => o.Deleted == false && o.Discount != null)
+                                     .Count();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+            return NumberOfNoDiscounts;
         }
     }
 }

@@ -17,7 +17,9 @@ namespace CardsCustomers.Models.Services
             public Customer customer { get; set; }
         }
         public int TotalPurchase();
-        public int TotalDiscountApplyed();
+        public int TotalPurchaseNoDiscountApplyed();
         public int TotalPurchaseWithDiscountApplyed();
+        public int CountDiscountsApplied();
+        public int CountNoDiscountsApplied();
     }
 }
