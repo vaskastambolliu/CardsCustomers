@@ -371,16 +371,7 @@ else
                 var skontoezgjedhur = discountPercent;
                 var valueToDiscount = cmimiaktual * discountPercent;
                 Transaction.NewValue = Transaction.Purchase - Convert.ToDecimal(valueToDiscount);
-
-                int pointdiscountedOfCurTrans = Transaction.PointsFromCurTrans.Value - discount.PointsNeeded;
-                if (pointdiscountedOfCurTrans <= 0)
-                {
-                    Transaction.Balance = 0;
-                }
-                else
-                {
-                    Transaction.Balance = customer.Points ;
-                }
+                Transaction.Balance = customer.Points ;
 
                 //must update the customer points
                 CustomerPointsUpdated = Transaction.Balance;
