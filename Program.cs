@@ -18,7 +18,7 @@ namespace CardsCustomers
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddSingleton<WeatherForecastService>();
-            //builder.Services.AddSyncfusionBlazor();
+            builder.Services.AddBlazorBootstrap(); // Add this line
             builder.Services.AddDbContext<DbCoreloginContext>(option =>
                 option.UseSqlServer(builder.Configuration.GetConnectionString("CardsCustomerDb")));
             builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>

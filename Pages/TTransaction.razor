@@ -232,13 +232,13 @@ else
                 //must update customers points
                 if (CustomerPointsUpdated.HasValue)
                 {
-                      customer.Points = CustomerPointsUpdated.Value;
+                    customer.Points = CustomerPointsUpdated.Value;
                 }
                 else
                 {
                     customer.Points = Transaction.Balance;
                 }
-              
+
                 CustomerService.UpdateCustomerWithoutRedirect(customer.IdCustomer, customer);
             }
             else
@@ -278,7 +278,9 @@ else
                     IdCustomerValueDdw = Convert.ToInt32(args.Value);
                     customer = CustomerService.GetCustomerById(Convert.ToInt32(args.Value));
                     Transaction.IdCard = customer.TimeStampIdCard;
-                    Transaction.Points = customer.Points.Value;
+
+                    Transaction.Points = customer.Points;
+
                 }
                 else
                 {
@@ -310,7 +312,10 @@ else
                     decimal? lastpointssaved = null;
                     Transaction.Balance = 0;
                     Transaction.Discount = -1;
+
                     Transaction.Points = customer.Points;
+
+
                     Transaction.NewValue = 0;
                     lastpointssaved = PointsPerMoneyService.GetLastPointPerMoneySaved();
                     if (lastpointssaved is null)
@@ -357,7 +362,7 @@ else
             if (args.Value.ToString() != "-1")
             {
 
-              IdDiscountFromDdw = Convert.ToInt32(args.Value);
+                IdDiscountFromDdw = Convert.ToInt32(args.Value);
                 Discount discount = DiscountService.GetDiscountById(Convert.ToInt32(IdDiscountFromDdw));
                 decimal discountPercent = Convert.ToDecimal(discount.DiscountPercent) / 100;
                 Transaction.Discount = Convert.ToInt32(IdDiscountFromDdw);
@@ -378,7 +383,7 @@ else
                 }
 
                 //must update the customer points
-                CustomerPointsUpdated = Transaction.Balance.Value;
+                CustomerPointsUpdated = Transaction.Balance;
                 Transaction.PointsFromCurTrans = 0;// if chosed one discount points of this purchase will remain 0
                 DiscountList = DiscountService.GetAllDiscount().ToList();//ddw of discounts after event gets null
             }

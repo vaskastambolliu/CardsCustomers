@@ -79,9 +79,9 @@
         {
             AllCustomers = CustomerService.GetAllCustomers();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw new InvalidOperationException("An error occured while opening the page!");
+            throw new InvalidOperationException("An error occured while opening the page!" +ex.Message);
           
         }
        

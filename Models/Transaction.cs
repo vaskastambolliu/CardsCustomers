@@ -11,7 +11,7 @@ public partial class Transaction
 
     public string? IdCard { get; set; }
 
-    public int? Points { get; set; }
+    public int Points { get; set; }
 
     public int? Purchase { get; set; }
 
@@ -19,7 +19,7 @@ public partial class Transaction
 
     public decimal? NewValue { get; set; }
 
-    public int? Balance { get; set; }
+    public int Balance { get; set; }
 
     public DateTime InsertDate { get; set; }
 

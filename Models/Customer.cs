@@ -17,7 +17,7 @@ public partial class Customer
 
     public string? Phone { get; set; }
 
-    public int? Points { get; set; }
+    public int Points { get; set; }
 
     public DateTime InsertDate { get; set; }
 

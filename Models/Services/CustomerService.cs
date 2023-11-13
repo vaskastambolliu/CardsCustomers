@@ -29,6 +29,7 @@ namespace CardsCustomers.Models.Services
         {
             try
             {
+                customer.InsertDate = DateTime.Now; 
                 _context.Customers.Add(customer);
                 _context.SaveChanges();
                 _navigationManager.NavigateTo("customers");

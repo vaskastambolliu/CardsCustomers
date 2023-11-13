@@ -106,7 +106,16 @@ namespace CardsCustomers.Models.Services
 
         public async Task<IEnumerable<Customer>> GetCustomers()
         {
-            return await _context.Customers.ToListAsync();
+            try
+            {
+                return await _context.Customers.OrderBy(x => x.IdCustomer).ToListAsync();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        
         }
         public async Task<IEnumerable<Discount>> GetDiscounts()
         {

@@ -4,6 +4,7 @@
 @using CardsCustomers.Models;
 @inject ICustomerService CustomerService
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider _authenticationStateProvider
 
 @*<h3>Customer</h3>*@
 <button type="submit" class="btn btn-outline-primary"
@@ -209,6 +210,10 @@ else
         {
             if (Id is null)
             {
+                var authstate = await _authenticationStateProvider.GetAuthenticationStateAsync();
+                var user = authstate.User;
+                var name = user.Identity.Name;
+                Customer.IdUserAdmin = CustomerService.GetCustomerByUserName(name.ToString());
                 CustomerService.CreateCustomer(Customer);
             }
             else
