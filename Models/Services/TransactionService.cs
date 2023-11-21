@@ -1,7 +1,12 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using CardsCustomers.Models.ChartsModels;
+using CardsCustomers.Pages;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol.Core.Types;
 using System;
+using System.Collections;
 
 namespace CardsCustomers.Models.Services
 {
@@ -210,5 +215,39 @@ namespace CardsCustomers.Models.Services
 
             return NumberOfNoDiscounts;
         }
+
+        public List<TransactionsPerMonth> GetPurchaseForMonth(string Year)
+        {
+            List<TransactionsPerMonth> ListTotalPurchaseForMonth = null;
+            try
+            {
+                //ListTotalPurchaseForMonth = _context.TransactionsPerMonth
+                //            .FromSqlRaw(@" SELECT convert(char(3), t.InsertDate, 0) AS monthp, year(t.InsertDate) AS yearp ,
+                //                           SUM(t.Purchase) AS Purchasep FROM   [dbo].[Transaction] t  WHERE  YEAR(t.InsertDate) = @Year 
+                //                           GROUP BY  convert(char(3), t.InsertDate, 0),YEAR(t.InsertDate) ORDER BY YEAR(t.InsertDate)"
+                //                            , new SqlParameter("Year", Year))
+                //            .ToList();
+
+                ListTotalPurchaseForMonth = _context.TransactionsPerMonth
+                    .FromSqlRaw("GetResultsForTransactionForMonth @Year", new SqlParameter("Year", Year))
+                    .ToList();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
+
+            return ListTotalPurchaseForMonth;
+        }
+
+        //[Serializable]
+        //public class PurchaseMonth
+        //{
+        //    public int Month { get; set; }
+        //    public int Purchase { get; set; }
+        //}
     }
 }

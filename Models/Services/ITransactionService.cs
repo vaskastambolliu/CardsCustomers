@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using CardsCustomers.Models.ChartsModels;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using static CardsCustomers.Models.Services.TransactionService;
 
 namespace CardsCustomers.Models.Services
 {
@@ -21,5 +23,7 @@ namespace CardsCustomers.Models.Services
         public int TotalPurchaseWithDiscountApplyed();
         public int CountDiscountsApplied();
         public int CountNoDiscountsApplied();
-    }
+        public List<TransactionsPerMonth> GetPurchaseForMonth(string Year);
+        
+        }
 }

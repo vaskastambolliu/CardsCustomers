@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CardsCustomers.Models;
 
 public partial class Transaction
 {
+    [Key]
     public int IdTransaction { get; set; }
 
     public int? IdCustomer { get; set; }
@@ -27,4 +30,5 @@ public partial class Transaction
 
     public bool? Deleted { get; set; }
     public int? PointsFromCurTrans { get; set; }
+
 }
